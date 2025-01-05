@@ -4,3 +4,12 @@ pydantic-settings==2.7.1
 pydantic_core==2.27.2
 crewai==0.95.0
 crewai-tools==0.25.8
+langchain==0.3.14
+langchain-anthropic==0.3.1
+langchain-cohere==0.3.4
+langchain-community==0.3.14
+langchain-core==0.3.29
+langchain-experimental==0.3.4
+langchain-openai==0.2.14
+langchain-text-splitters==0.3.4
+firecrawl-py==1.8.0
