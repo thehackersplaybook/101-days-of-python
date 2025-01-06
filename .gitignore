@@ -172,3 +172,5 @@ cython_debug/
 
 output.json
 output.md
+cache
+.DS_Store

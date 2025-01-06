@@ -1,3 +1,5 @@
+numpy==1.26.4
+pandas==1.5.3
 python-dotenv==1.0.1
 pydantic==2.10.4
 pydantic-settings==2.7.1
@@ -14,3 +16,4 @@ langchain-openai==0.2.14
 langchain-text-splitters==0.3.4
 firecrawl-py==1.8.0
 groq==0.13.1
+pandasai==2.4.2
