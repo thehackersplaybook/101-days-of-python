@@ -17,3 +17,8 @@ langchain-text-splitters==0.3.4
 firecrawl-py==1.8.0
 groq==0.13.1
 pandasai==2.4.2
+torch==2.5.1
+torchaudio==2.5.1
+torchvision==0.20.1
+scikit-learn==1.6.0
+scipy==1.15.0
