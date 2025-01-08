@@ -24,3 +24,4 @@ scikit-learn==1.6.0
 scipy==1.15.0
 chroma-hnswlib==0.7.6
 chromadb==0.5.23
+markdownify==0.14.1
