@@ -66,3 +66,22 @@ with col3:
     for action in st.session_state.history["Reset"]:
         st.write(action)
 
+#Footer
+st.markdown(
+        """
+        <style>
+        .bottom-right {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.9em;
+            color: gray;
+        }
+        </style>
+        <div class="bottom-right">
+            Made with ⚡ at 'The Hackers Playbook' ©. All rights reserved.
+        </div>
+        """,
+        unsafe_allow_html=True
+                )
+

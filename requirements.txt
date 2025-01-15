@@ -17,3 +17,7 @@ langchain-text-splitters==0.3.4
 firecrawl-py==1.8.0
 groq==0.13.1
 pandasai==2.4.2
+googletrans==4.0.0-rc1
+pyttsx3==2.90
+pydub==0.25.1
+SpeechRecognition==3.8.1
