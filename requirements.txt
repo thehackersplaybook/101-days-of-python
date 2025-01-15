@@ -25,3 +25,7 @@ scipy==1.15.0
 chroma-hnswlib==0.7.6
 chromadb==0.5.23
 markdownify==0.14.1
+youtube-transcript-api==0.6.3
+google-ai-generativelanguage==0.6.10
+google-generativeai==0.8.3
+ollama==0.4.6
