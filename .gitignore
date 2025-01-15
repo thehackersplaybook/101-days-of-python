@@ -174,3 +174,4 @@ output.json
 output.md
 cache
 .DS_Store
+outputs/
