@@ -16,17 +16,26 @@ st.set_page_config(page_title="Bharat HealthEasy.ai 🚑", page_icon="⚕️", l
 st.title("🩺 Bharat HealthEasy 🚑")
 st.caption("Upload your Medical Reports and Get Easy Explanation")
 
-if not os.path.exists(".env"):
-    secret_key = Fernet.generate_key()
-    with open(".env", "w") as file:
-        file.write(f"SECRET_KEY={secret_key.decode()}\n")
-    st.warning("🔑 Secret Key Generated — Restart App")
+ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))
 
-load_dotenv()
+if not os.path.exists(ENV_PATH) or "SECRET_KEY" not in open(ENV_PATH).read():
+    secret_key = Fernet.generate_key().decode()
+    with open(ENV_PATH, "w") as file:
+        file.write(f"SECRET_KEY={secret_key}\n")
+        
+    st.warning("🔑 Secret Key Generated — Restart App.")
+    st.warning("🔑 Secret Key Generated — Please restart the app manually.")
+    st.stop()
+
+    load_dotenv(dotenv_path=ENV_PATH, override=True)
+    st.stop()
+
+load_dotenv(dotenv_path=ENV_PATH, override=True)
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 if not SECRET_KEY:
-    st.error("❌ SECRET_KEY Not Found")
+    st.error("❌ SECRET_KEY Not Found in .env file. Try restarting the app.")
     st.stop()
 
 cipher = Fernet(SECRET_KEY)

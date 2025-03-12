@@ -1,0 +1,254 @@
+[33mcommit 5f680ea06b04f142dba7f01000b3177a9989144c[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Merge: 67948f2 0becb69
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Mon Mar 10 16:20:43 2025 +0530
+
+    Merge branch 'main' of github.com:thehackersplaybook/101-days-of-python
+
+[33mcommit 67948f2dad35e76a1db5ed110ac71740646e6b1c[m[33m ([m[1;31mupstream/main[m[33m)[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Mon Mar 10 16:19:21 2025 +0530
+
+    Implemented post button function and added secret key input for API calls
+
+[33mcommit 0becb69f5e25d44e0879f93f1a5b15e9d75bd221[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Sat Mar 8 07:38:22 2025 +0530
+
+    image resizer
+
+[33mcommit 45c1079a7e10ab49132414eed03353c3d030dbb8[m
+Merge: 74b83a9 0aa82e6
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Sat Mar 8 03:38:16 2025 +0530
+
+    Merge pull request #22 from SarveshBhujle/main
+    
+    Fixed the UI of the Tweet Stormer
+
+[33mcommit 0aa82e61c0249bd187eb7ecd6ab48cfed4856534[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Sat Mar 8 03:26:29 2025 +0530
+
+    Fixed the UI of the Tweet Stormer
+
+[33mcommit 74b83a9dffcb84e8776720fd88c7f8221fef34b1[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Sat Mar 8 00:38:33 2025 +0530
+
+    tweet stormer: cleanup, bugfixes and implementation
+
+[33mcommit ee90c631dc7b0af878917bcf32e0f6c0c0300b9b[m
+Merge: 2eeb684 4609e3a
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Fri Mar 7 23:38:34 2025 +0530
+
+    Merge pull request #21 from SarveshBhujle/main
+    
+    Added medical report analyzer and tweet stormer
+
+[33mcommit 4609e3a651af2eee33f77fa4932cb0133160db9f[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Fri Mar 7 23:34:52 2025 +0530
+
+    Added medical report analyzer and tweet stormer
+
+[33mcommit 2eeb6845f91e5980f6a55ddcc5525a90b03a6c26[m
+Merge: e2c5670 1c07f2e
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Fri Mar 7 01:53:16 2025 +0530
+
+    Merge pull request #20 from shantanubkr/main
+    
+    Added an opening statement feature in Debate Resolver
+
+[33mcommit 1c07f2e105245a27f37aa6a81771d309c4408935[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Fri Mar 7 01:52:28 2025 +0530
+
+    Updated personal files
+
+[33mcommit c80fecc3a54f0620b0aadfd9859f4d4ad04d1a21[m
+Merge: 8e12eeb ab22936
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Fri Mar 7 01:37:08 2025 +0530
+
+    Merge remote-tracking branch 'sarvesh/main'
+
+[33mcommit 8e12eeb31c25a49292774d91642cf1f3c3ce5c2d[m
+Merge: 164148f e2c5670
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Fri Mar 7 01:23:18 2025 +0530
+
+    Added an opening statement feature in debate resolver
+
+[33mcommit e2c56702c7eab907bf85174239a97ddb194d45c0[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Fri Mar 7 00:18:24 2025 +0530
+
+    add debate resolver
+
+[33mcommit ab22936beb3ff7270b8701c498e86451c13bc9a2[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Thu Mar 6 00:38:48 2025 +0530
+
+    Add resume analyzer function in interviewer.py
+
+[33mcommit 24c8e3024a116c961af53c665bb0e3ba1685d33b[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Wed Mar 5 17:06:42 2025 +0530
+
+    streamlit/interviewer: improvements
+    
+    - enhanced report generation
+    - add docstrings and typings
+    - update prompts
+    - refactor for readability
+
+[33mcommit 49b7a52b0bfb78aa1b463c2bd74f676ebe0d4956[m
+Merge: eb2dd87 c51910a
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Wed Mar 5 16:12:01 2025 +0530
+
+    Merge pull request #18 from SarveshBhujle/main
+    
+    Built a AI-powered Interviewer using streamlit
+
+[33mcommit c51910ab3dabd1b9e42a4536ec11f97e50016921[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Wed Mar 5 16:05:57 2025 +0530
+
+    Built AI-powered Interviewer
+
+[33mcommit 164148f0d6f9290f301ad34a1b1c6d168091f2b6[m
+Merge: e9f1a7c eb2dd87
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Mar 5 02:08:36 2025 +0530
+
+    Merge branch 'main' of github.com:thehackersplaybook/101-days-of-python
+
+[33mcommit 8ca4609a301a9dbaecc6a4d7c5110a59e2ea2f84[m
+Merge: 980c72f eb2dd87
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Wed Mar 5 02:00:33 2025 +0530
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit eb2dd8725668622e550883b4b79a32b211867cc3[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Wed Mar 5 02:00:12 2025 +0530
+
+    face_emotion_detector: fix emotion detection logic and image processing
+
+[33mcommit 980c72f555e3a3229616100bd275f7bc04550164[m
+Merge: 73efbda 0e39577
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Wed Mar 5 01:38:08 2025 +0530
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit e9f1a7c12bae651aaa0ffe0ce2e706eaff12722b[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Mar 5 01:31:20 2025 +0530
+
+    Updated functions in the emotion detecter
+
+[33mcommit 0e395770e4e953d0731aa70802d69c090ae06dc2[m
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Wed Mar 5 00:06:59 2025 +0530
+
+    face emotion detector
+
+[33mcommit 73efbda8b3f1e6c90a05262dd96dd94a6cd0f50f[m[33m ([m[1;31morigin/streamlit-app[m[33m, [m[1;32mstreamlit-app[m[33m)[m
+Merge: 8047ddc 193205c
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Tue Mar 4 23:18:30 2025 +0530
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 8047ddc724ce477bae6853a15f4193deab599d6c[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Tue Mar 4 23:12:26 2025 +0530
+
+    Add book summarizer and interview assistant
+
+[33mcommit 193205c0d952d01795caee6c5ab35ae96f685708[m
+Merge: 799d33f 306ab2f
+Author: Aditya Patange <contact.adityapatange@gmail.com>
+Date:   Tue Mar 4 00:00:47 2025 +0530
+
+    Merge pull request #17 from shantanubkr/main
+    
+    Add a Needle in the Haystack Jupyter Notebook
+
+[33mcommit ca958ec6a2f20cd0d133a4fb9f61f44fcdfd85a3[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Mon Mar 3 15:49:32 2025 +0530
+
+    Changes in Interview Assistant
+
+[33mcommit 2574219f0766da90075cf8c42f82df2a5a92f9a7[m
+Merge: 2bddb7d 306ab2f
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Mon Mar 3 15:19:23 2025 +0530
+
+    Merge remote-tracking branch 'shantanu/main'
+
+[33mcommit 2bddb7d348d011ff301fdde922b0732e10780649[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Mon Mar 3 14:54:41 2025 +0530
+
+    Add book Summarizer
+
+[33mcommit 306ab2f793950e0b8e74f7887477350484deb77c[m[33m ([m[1;31mshantanu/main[m[33m)[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Sun Mar 2 13:43:29 2025 +0530
+
+    Built an Interview Assistant Jupyter Notebook
+
+[33mcommit 86ff5f55c528b1714c87e50ee8c15256d2764b11[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Fri Feb 28 03:15:14 2025 +0530
+
+    Built a new notebook on the 'Needle in the Haystack Problem'
+
+[33mcommit 3008e0c51db92788c614b4151cc5e82bb3cc6471[m
+Author: Sarvesh <sarveshbhujle2609@gmail.com>
+Date:   Wed Feb 26 15:41:05 2025 +0530
+
+    Add dependency version checker
+
+[33mcommit 7d250b5bb51355b4f253ebfc768dd349e39d0e99[m
+Merge: 9b36f70 f6e2d35
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Feb 26 15:06:27 2025 +0530
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 9b36f70e36888e0db4f90a1de131d6acd3a4bf08[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Feb 26 14:56:15 2025 +0530
+
+    Built a dependancy version analyzer and made updates to linkedin post analyzer
+
+[33mcommit f6e2d3592f56876823b8b7825be56d7daf1cfc8b[m
+Merge: bc8f127 799d33f
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Feb 26 14:48:46 2025 +0530
+
+    Merge remote-tracking branch 'upstream/main'
+
+[33mcommit bc8f127f2e857f75b82f9e84f2828fdef61a1c1d[m
+Merge: fd9b353 9e2241e
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Feb 26 14:45:32 2025 +0530
+
+    Merge remote-tracking branch 'sarvesh/main'
+
+[33mcommit fd9b353cd5502304c60be5050e18ad53f67c26f1[m
+Author: Shantanu Borkar <shantanubkr@gmail.com>
+Date:   Wed Feb 26 14:41:02 2025 +0530
+
+    testing
+
+[

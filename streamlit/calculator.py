@@ -3,7 +3,16 @@ import math
 
 st.set_page_config(page_title="Profesional Calculator", layout="centered", page_icon="🧮")
 
-def calculate(operation, num1 ,num2=None):
+def calculate(operation, num1 ,num2=None) -> int:
+    """
+    Function to perform basic mathematical operations
+    Args:
+        operation (str): The operation to be performed
+        num1 (int): The first number
+        num2 (int): The second number
+    Returns:
+        result (int): The result of the operation
+    """
     try:
         if operation == 'Addition':
             sign = '+'

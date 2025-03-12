@@ -3,12 +3,37 @@ import openai
 import os
 from dotenv import load_dotenv
 import json
-load_dotenv()
+
+
+st.set_page_config(page_title="Modern Recipe Generator", layout="wide")
+
+env_path = os.path.abspath("./.env")
+print(f"Looking for .env file at: {env_path}")
+
+if os.path.exists(env_path):
+    print(".env file found!")
+else:
+    print("Error: .env file NOT found!")
+
+load_dotenv(dotenv_path=env_path, override=True)
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
-DEFAULT_OPENAI_MODEL = "gpt-4"
+print(f"Loaded API Key: {openai.api_key}") 
 
-def get_recipes_from_ingredients(ingredients, item, cuisine, num_recipes=5):
+DEFAULT_OPENAI_MODEL = "gpt-4"
+print(f"Loaded API Key: {os.getenv('OPENAI_API_KEY')}")
+
+def get_recipes_from_ingredients(ingredients, item, cuisine, num_recipes=5) -> list:
+    """
+    Generate recipes based on the provided ingredients and cuisine.
+    Args:
+        ingredients (str): Comma-separated list of ingredients.
+        item (str): The item to be made.
+        cuisine (str): The cuisine of the recipe.
+        num_recipes (int): The number of recipes to generate.
+    Returns:
+        list: A list of dictionaries containing the recipe details.
+    """
     system_prompt = f"""
 Create {num_recipes} unique and authentic {cuisine} recipes using the following core ingredients: {ingredients}.
 Generate a high-quality recipe for {item} in {cuisine} style, ensuring that it strictly adheres to the provided ingredients.
@@ -42,6 +67,13 @@ Do not include any additional text or explanations.
         return None
 
 def display_recipes(recipes):
+    """
+    Display the generated recipes on the Streamlit app.
+    Args:
+        recipes (list): A list of dictionaries containing the recipe details.
+    Returns:
+        None
+    """
     num_columns = 3  
     columns = st.columns(num_columns)
     
@@ -65,7 +97,6 @@ def display_recipes(recipes):
             st.markdown("---") 
 
 def main():
-    st.set_page_config(page_title="Modern Recipe Generator", layout="wide")
     st.title("🍳 Recipe Generator")
     st.write("Generate delicious recipes based on your ingredients with AI.")
 
@@ -85,7 +116,7 @@ def main():
             st.warning("Please enter ingredients.")
         elif ',' not in ingredients:
             st.warning("Please separate ingredients with commas.")
-        else:
+        else:    
             with st.spinner("Generating recipes..."):
                 recipes = get_recipes_from_ingredients(ingredients, item, cuisine, num_recipes)
             if recipes:
