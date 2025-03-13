@@ -16,7 +16,6 @@ import chromadb
 import chromadb.utils.embedding_functions as embedding_functions
 import asyncio
 from typing import List, Any, Tuple
-import time
 import traceback
 import logging
 import os
