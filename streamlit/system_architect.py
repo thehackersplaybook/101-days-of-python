@@ -377,7 +377,7 @@ class StreamlitUI:
         """Configure and setup the Streamlit page layout."""
         try:
             st.set_page_config(
-                page_title="S2A901: System Architect 🚀", page_icon="🐦", layout="wide"
+                page_title="S2A901: System Architect 🚀", page_icon="🤖", layout="wide"
             )
             st.title("🚀 S2A901: System Architect 🧰")
             st.caption(
