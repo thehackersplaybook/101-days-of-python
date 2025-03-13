@@ -22,10 +22,49 @@ import os
 from dotenv import load_dotenv
 from dataclasses import dataclass
 
+
+class Constants:
+    """System-wide constants"""
+
+    # Logging
+    LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s\n%(exc_info)s"
+    LOG_LEVEL = logging.INFO
+
+    # UI Constants
+    PAGE_TITLE = "S2A901: System Architect 🚀"
+    PAGE_ICON = "🤖"
+    PAGE_LAYOUT = "wide"
+    APP_TITLE = "🚀 S2A901: System Architect 🧰"
+    APP_CAPTION = "S2A901 is a System Architect that's part of the AI workforce at The Hackers Playbook."
+
+    # Sidebar Constants
+    SIDEBAR_TITLE = "📝 Configuration"
+    PROMPT_PLACEHOLDER = "System design for booking app."
+    CONTEXT_PLACEHOLDER = "Describe the context for the requirements."
+    TEMPERATURE_MIN = 0.0
+    TEMPERATURE_MAX = 1.0
+    TEMPERATURE_DEFAULT = 0.5
+
+    # OpenAI Constants
+    GPT4_MODEL = "gpt-4o"
+    GPT4_MINI_MODEL = "gpt-4o-mini"
+    QUERY_RESULTS_COUNT = 4
+
+    # Loading Messages
+    LOADING_MESSAGE = "Connecting S2A901 to Lunar Frequencies..."
+    SUCCESS_MESSAGE = "📡  S2A901 Connected."
+    RESPONSE_HEADER = "# 🚀 S2A901 Response:"
+    GENERATING_MESSAGE = "🔮 Generating response..."
+
+    # Error Messages
+    ERROR_PREFIX = "An error occurred: "
+    ERROR_SUFFIX = "Please check the logs for more details."
+
+
 # Enhanced logging configuration
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s\n%(exc_info)s",
+    level=Constants.LOG_LEVEL,
+    format=Constants.LOG_FORMAT,
 )
 logger = logging.getLogger(__name__)
 
@@ -235,10 +274,10 @@ class ResponseGenerator:
             )
 
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=Constants.GPT4_MINI_MODEL,
                 messages=self._create_messages(user_prompt),
                 max_completion_tokens=SystemConfig.DEFAULT_MAX_TOKENS,
-                temperature=0.5,
+                temperature=Constants.TEMPERATURE_DEFAULT,
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -271,7 +310,7 @@ class ResponseGenerator:
         """
         try:
             retrieval_results = self.knowledge_base.collection.query(
-                query_texts=[prompt], n_results=4
+                query_texts=[prompt], n_results=Constants.QUERY_RESULTS_COUNT
             )
             knowledge_packets = self.flatten_list(retrieval_results["documents"])
             knowledge_summary = self.summarize_knowledge(prompt, knowledge_packets)
@@ -351,7 +390,7 @@ class ResponseGenerator:
             """
 
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=Constants.GPT4_MODEL,
                 messages=self._create_messages(user_prompt),
                 max_completion_tokens=max_tokens,
                 temperature=temperature,
@@ -377,12 +416,12 @@ class StreamlitUI:
         """Configure and setup the Streamlit page layout."""
         try:
             st.set_page_config(
-                page_title="S2A901: System Architect 🚀", page_icon="🤖", layout="wide"
+                page_title=Constants.PAGE_TITLE,
+                page_icon=Constants.PAGE_ICON,
+                layout=Constants.PAGE_LAYOUT,
             )
-            st.title("🚀 S2A901: System Architect 🧰")
-            st.caption(
-                "S2A901 is a System Architect that's part of the AI workforce at The Hackers Playbook."
-            )
+            st.title(Constants.APP_TITLE)
+            st.caption(Constants.APP_CAPTION)
         except Exception as e:
             log_error(e, "Failed to setup Streamlit page")
             raise SystemArchitectError(f"UI setup failed: {str(e)}")
@@ -395,18 +434,21 @@ class StreamlitUI:
         Returns:
             tuple: User inputs from the sidebar
         """
-        st.sidebar.title("📝 Configuration")
+        st.sidebar.title(Constants.SIDEBAR_TITLE)
         prompt = st.sidebar.text_input(
-            "Prompt", placeholder="System design for booking app."
+            "Prompt", placeholder=Constants.PROMPT_PLACEHOLDER
         )
         context = st.sidebar.text_area(
-            "Context", placeholder="Describe the context for the requirements."
+            "Context", placeholder=Constants.CONTEXT_PLACEHOLDER
         )
         max_tokens = st.sidebar.number_input(
             "🔢 Max Tokens", value=SystemConfig.DEFAULT_MAX_TOKENS
         )
         temperature = st.sidebar.slider(
-            "🌡️ Temperature", min_value=0.0, max_value=1.0, value=0.5
+            "🌡️ Temperature",
+            min_value=Constants.TEMPERATURE_MIN,
+            max_value=Constants.TEMPERATURE_MAX,
+            value=Constants.TEMPERATURE_DEFAULT,
         )
         submit_button = st.sidebar.button("🚀 Generate Response")
         return prompt, context, max_tokens, temperature, submit_button
@@ -423,13 +465,13 @@ async def main():
 
         prompt, context, max_tokens, temperature, submit_button = ui.create_sidebar()
 
-        with st.spinner("Connecting S2A901 to Lunar Frequencies...", show_time=True):
+        with st.spinner(Constants.LOADING_MESSAGE, show_time=True):
             await kb.load_into_db()
-        st.success("📡  S2A901 Connected.")
+        st.success(Constants.SUCCESS_MESSAGE)
 
         if submit_button:
-            st.markdown("# 🚀 S2A901 Response:")
-            with st.spinner("🔮 Generating response..."):
+            st.markdown(Constants.RESPONSE_HEADER)
+            with st.spinner(Constants.GENERATING_MESSAGE):
                 container = st.empty()
                 response_gen.generate_response(
                     prompt, container, context, max_tokens, temperature
@@ -437,8 +479,8 @@ async def main():
     except Exception as e:
         log_error(e, "Application error")
         st.error(
-            f"""An error occurred: {str(e)}
-                 Please check the logs for more details."""
+            f"""{Constants.ERROR_PREFIX}{str(e)}
+                 {Constants.ERROR_SUFFIX}"""
         )
         logger.error("Full stack trace:", exc_info=True)
 
