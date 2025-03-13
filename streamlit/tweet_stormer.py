@@ -6,10 +6,6 @@ from openai import OpenAI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import tweepy
-import requests
-import time
-import datetime
-
 
 load_dotenv(override=True, dotenv_path=".env")
 
@@ -19,14 +15,17 @@ API_KEY = os.getenv("API_KEY")
 API_SECRET = os.getenv("API_SECRET")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 ACCESS_SECRET = os.getenv("ACCESS_SECRET")
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
 
 class Tweet(BaseModel):
     content: str
 
+
 class GenerateTweetResponse(BaseModel):
     tweets: list[Tweet]
 
-if not all([API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET]):
+if not all([API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET, BEARER_TOKEN]):
     raise ValueError("❌ Missing API credentials. Check your .env file.")
 
 
@@ -116,94 +115,31 @@ def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, N
         print(f"Failed to refine tweet. Error: {str(e)}")
         traceback.print_exc()
         return None
-
-def handle_rate_limits(response):
-    try:
-        reset_time = int(response.headers.get("x-rate-limit-reset", time.time()))
-        remaining_requests = int(response.headers.get("x-rate-limit-remaining", 0))
-
-        current_time = int(time.time())
-        remaining_time = reset_time - current_time  
-        reset_time_str = datetime.datetime.utcfromtimestamp(reset_time).strftime('%Y-%m-%d %H:%M:%S UTC')
-
-        if remaining_requests > 0:
-            print(f"✅ Remaining Requests: {remaining_requests}. You can retry now.")
-            return True
-
-        if remaining_time < 30:
-            print(f"⏳ Rate limit exceeded. Retrying in {remaining_time} seconds...")
-            time.sleep(remaining_time)
-            return True
-        else:
-            print(f"⚠️ Rate limit exceeded. Reset at: {reset_time_str}. Try again later.")
-            return False
-
-    except AttributeError:
-        print("❌ Response object does not have headers attribute.")
-        return False
-    except KeyError as e:
-        print(f"❌ Missing expected header: {str(e)}")
-        return False
-    except Exception as e:
-        print(f"❌ Failed to check rate limits: {str(e)}")
-        return False
-
-def get_rate_limit_status(client):
-    try:
-        rate_limit_status = client.get_rate_limit_status()
-        remaining_requests = rate_limit_status["resources"]["statuses"]["/statuses/update"]["remaining"]
-        reset_time_unix = rate_limit_status["resources"]["statuses"]["/statuses/update"]["reset"]
-        
-        reset_time_str = datetime.datetime.utcfromtimestamp(reset_time_unix).strftime('%Y-%m-%d %H:%M:%S UTC')
-        
-        return remaining_requests, reset_time_str
-    except Exception as e:
-        print(f"⚠️ Failed to fetch rate limit status: {str(e)}")
-        return None, None
-
-
-def post_tweet(tweet_content: str, api_key, api_secret, access_token, access_secret) -> bool:
+    
+def post_tweet(tweet_content: str, api_key, api_secret, access_token, access_secret, bearer_token) -> bool:
     try:
         client = tweepy.Client(
             consumer_key=api_key,
             consumer_secret=api_secret,
             access_token=access_token,
             access_token_secret=access_secret,
+            bearer_token=bearer_token
         )
 
         response = client.create_tweet(text=tweet_content)
 
-        print("🚀 API Response:", response)
-
-        if hasattr(response, "errors") and response.errors:
-            print(f"❌ API Error: {response.errors}")
-            return False
-
         if response and response.data and "id" in response.data:
             tweet_id = response.data["id"]
             print(f"✅ Tweet posted successfully! ID: {tweet_id}")
-
-            time.sleep(5) 
-            try:
-                rate_limits = client.get_rate_limits()
-                tweet_limit = rate_limits["tweet"]["remaining"]
-                reset_time = rate_limits["tweet"]["reset"]
-
-                print(f"🔄 Remaining Tweets: {tweet_limit}")
-                print(f"⏳ Rate Limit Resets At: {reset_time}")
-            except Exception as e:
-                print(f"⚠️ Failed to fetch rate limit status: {str(e)}")
-
             return True
         else:
-            print("❌ Failed to post tweet.")
+            print(f"❌ Failed to post tweet. {response}")
             return False
-
-    except tweepy.TweepyException as e:
-        print(f"❌ Error posting tweet: {str(e)}")
+    except Exception as e:
+        print(f"❌ Failed to post tweet. Error: {str(e)}")
+        traceback.print_exc()
         return False
 
-                
 
 tweets_generated = []
 
@@ -222,17 +158,12 @@ def main():
 
     st.sidebar.title("📝 Configuration")
 
-    if "remaining_requests" in st.session_state and "reset_time" in st.session_state:
-        st.sidebar.subheader("📊 API Rate Limits")
-        st.sidebar.write(f"✅ **Remaining Requests:** {st.session_state['remaining_requests']}")
-        st.sidebar.write(f"🕒 **Resets At:** {st.session_state['reset_time']}")
-
-
     with st.sidebar.expander("🔑 Twitter API Credentials"):
         user_api_key = st.text_input("X API Key", type="password")
         user_api_secret = st.text_input("X API Secret", type="password")
         user_access_token = st.text_input("Access Token", type="password")
         user_access_secret = st.text_input("Access Secret", type="password")
+        user_bearer_token = st.text_input("Bearer Token", type="password")
 
     context = st.sidebar.text_input(
         "📝 Context", placeholder="Enter your context here..."
@@ -281,10 +212,10 @@ def main():
                 post_tweet_button = column2.button("🚀 Post Tweet", key=f"post_tweet_{idx}")
 
                 if post_tweet_button:
-                    if not all ([user_api_key, user_api_secret, user_access_token, user_access_secret]):
+                    if not all ([user_api_key, user_api_secret, user_access_token, user_access_secret, user_bearer_token]):
                         st.error("❌ Please enter valid X API credentials before posting.")
                     else:
-                        success = post_tweet(tweet.content, user_api_key, user_api_secret, user_access_token, user_access_secret)
+                        success = post_tweet(tweet.content, user_api_key, user_api_secret, user_access_token, user_access_secret, user_bearer_token)
                         if success:
                             st.session_state[post_key] = True
                             st.success("✅ Tweet Posted Successfully!")

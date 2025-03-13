@@ -8,7 +8,6 @@ st.markdown("A simple and elegant counter application.")
 # Initialize the counter & History 
 if 'counter' not in st.session_state:
     st.session_state.counter = 0
-if 'history' not in st.session_state:
     st.session_state.history = {
         "Increment" : [],
         "Decrement" : [],
@@ -21,51 +20,7 @@ st.metric(label="Counter", value=st.session_state.counter)
 
 # Update the history
 def update_history(action):
-    """
-    Function to update the history of actions
-    Args:
-        action (str): The action performed
-    Returns:
-        None
-        """
     st.session_state.history[action].append(f"{action}: {st.session_state.counter}")
-
-# Function to increment counter
-def increment_counter():
-    """
-    Function to increment the counter.
-    Args:
-        None
-    Returns:
-        None
-    """
-    st.session_state.counter += 1
-    update_history("Increment")
-
-# Function to decrement counter
-def decrement_counter():
-    """
-    Function to decrement the counter.
-    Args:
-        None
-    Returns:
-        None
-    """
-    st.session_state.counter -= 1
-    update_history("Decrement")
-
-# Function to reset counter
-def reset_counter():
-    """
-    Function to reset the counter to 0
-    Args:
-        None
-    Returns:
-        None
-    """
-    st.session_state.counter = 0
-    update_history("Reset")
-
 
 # Columns for buttons
 st.write("### Actions")
@@ -73,14 +28,21 @@ col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
     # Increment button
-    st.button("🔼 Increment", on_click=increment_counter)
+    if st.button("🔼 Increment"):
+        st.session_state.counter += 1
+        update_history("Increment")
 
 with col2:
     # Decrement button
-    st.button("🔽 Decrement", on_click=decrement_counter)
+    if st.button("🔽 Decrement"):
+        st.session_state.counter -= 1
+        update_history("Decrement")
+
 with col3:
     # Reset button
-    st.button("🔄 Reset Counter", on_click=reset_counter)
+    if st.button("🔄 Reset Counter"):
+        st.session_state.counter = 0
+        update_history("Reset")
 
 # History of actions
 st.subheader("Action History")
@@ -89,23 +51,20 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     #Increment History
     st.write("Increment")
-    if st.session_state.history["Increment"]:
-        for action in reversed(st.session_state.history["Increment"][-5:]):  # Show only last 5 entries
-            st.write(action)
+    for action in st.session_state.history["Increment"]:
+        st.write(action)
 
 with col2:
     #Decrement History
     st.write("Decrement")
-    if st.session_state.history["Decrement"]:
-        for action in reversed(st.session_state.history["Decrement"][-5:]):  # Show only last 5 entries
-            st.write(action)
+    for action in st.session_state.history["Decrement"]:
+        st.write(action)
 
 with col3:
     #Reset History
     st.write("Reset")
-    if st.session_state.history["Reset"]:
-        for action in reversed(st.session_state.history["Reset"][-5:]):  # Show only last 5 entries
-            st.write(action)
+    for action in st.session_state.history["Reset"]:
+        st.write(action)
 
 #Footer
 st.markdown(
