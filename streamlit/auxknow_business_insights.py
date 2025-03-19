@@ -9,7 +9,8 @@ from auxknow import AuxKnow
 load_dotenv(override=True, verbose=True)
 
 auxknow = AuxKnow(
-    api_key=os.getenv("PERPLEXITY_API_KEY"), openai_api_key=os.getenv("OPENAI_API_KEY")
+    perplexity_api_key=os.getenv("PERPLEXITY_API_KEY"),
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
 )
 
 
@@ -31,15 +32,68 @@ async def main():
 
     submit_button = st.sidebar.button("🔮 Run Magic!")
 
+    deep_research_enabled = st.sidebar.checkbox(
+        "🔍 Deep Research Mode",
+        help="Enable this mode for more detailed and comprehensive insights.",
+    )
+
+    fast_mode_enabled = st.sidebar.checkbox(
+        "🚀 Fast Mode",
+        help="Enable this mode for faster insights generation.",
+    )
+
     if submit_button:
+        if not prompt:
+            st.warning("Please enter a valid prompt to generate insights.")
+            return None
+        if deep_research_enabled:
+            auxknow.set_config(
+                {
+                    "answer_length_in_paragraphs": 8,
+                    "lines_per_paragraph": 8,
+                }
+            )
+        else:
+            auxknow.set_config(
+                {
+                    "answer_length_in_paragraphs": 3,
+                    "lines_per_paragraph": 3,
+                }
+            )
+        if fast_mode_enabled:
+            auxknow.set_config(
+                {
+                    "answer_length_in_paragraphs": 2,
+                    "lines_per_paragraph": 3,
+                    "fast_mode_enabled": True,
+                }
+            )
+        else:
+            auxknow.set_config(
+                {
+                    "answer_length_in_paragraphs": 3,
+                    "lines_per_paragraph": 3,
+                    "fast_mode_enabled": False,
+                }
+            )
         if prompt:
-            prompt_container = st.empty()
-            container = st.empty()
-            citations_container = st.empty()
-            prompt_container.markdown(f"> Prompt: '{prompt}'")
-            with st.spinner("🔮 Generating Insights..."):
+            if deep_research_enabled and fast_mode_enabled:
+                st.warning(
+                    "⚠️ Both 'Deep Research Mode' and 'Fast Mode' are enabled. They cannot work together. Please disable one of them."
+                )
+                return None
+            with st.spinner("🔮 Generating Insights...", show_time=True):
+                prompt_container = st.empty()
+                container = st.empty()
+                citations_container = st.empty()
+                prompt_container.markdown(f"> Prompt: '{prompt}'")
+
                 full_content = ""
-                response = auxknow.ask_stream(question=prompt)
+                response = auxknow.ask_stream(
+                    question=prompt,
+                    deep_research=deep_research_enabled,
+                    fast_mode=fast_mode_enabled,
+                )
                 citations = []
                 for chunk in response:
                     full_content += chunk.answer
