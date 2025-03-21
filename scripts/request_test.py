@@ -13,6 +13,7 @@ def get_linkedin_profile()-> dict:
     Returns:        
         dict: The LinkedIn profile information.
     """
+    
     url = "https://api.linkedin.com/v2/me"
     headers = {
         "Authorization": f"Bearer {access_token}",

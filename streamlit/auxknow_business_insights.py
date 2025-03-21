@@ -18,6 +18,16 @@ auxknow = AuxKnow(
 )
 
 async def main():
+    """
+    Main function to run the AuxKnow Business Insights Agent.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    
     st.set_page_config(
         page_title="AuxKnow Business Insights Agent",
         page_icon="💡",

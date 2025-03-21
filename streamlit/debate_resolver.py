@@ -19,10 +19,28 @@ class Participant(BaseModel):
 
 class State:
     def __init__(self):
+        """
+        Initializes a State object.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.participants: list[Participant] = []
         self.debate_context = ""
 
     def add_participant(self, participant: Participant) -> None:
+        """
+        Adds a participant to the state.
+
+        Args:
+            participant (Participant): Participant to be added.
+
+        Returns:
+            None
+        """
         existing_participant = self.get_participant_by_name(participant.name)
         if existing_participant:
             st.warning(f"Participant {participant.name} already exists!")
@@ -30,11 +48,30 @@ class State:
         self.participants.append(participant)
 
     def add_participant_opinion(self, name: str, opinion: str) -> None:
+        """
+        Adds an opinion for a participant.
+
+        Args:
+            name (str): Name of the participant.
+            opinion (str): Opinion to be added.
+
+        Returns:
+            None
+        """
         participant = self.get_participant_by_name(name)
         if participant:
             participant.opinions.append(opinion)
 
     def get_participant_by_name(self, name: str) -> Participant:
+        """
+        Retrieves a participant by name.
+
+        Args:
+            name (str): Name of the participant.
+
+        Returns:
+            Participant: Participant with the given name.
+        """
         return next(
             (
                 participant
@@ -45,15 +82,51 @@ class State:
         )
 
     def add_debate_context(self, context: str) -> None:
+        """
+        Adds a debate context to the state.
+
+        Args:
+            context (str): Debate context to be added.
+
+        Returns:
+            None
+        """
         self.debate_context = context
 
     def get_debate_context(self) -> str:
+        """
+        Retrieves the debate context from the state.
+
+        Args:
+            None
+
+        Returns:        
+            str: Debate context.
+        """
         return self.debate_context
 
     def get_participants(self) -> list[Participant]:
+        """
+        Retrieves the participants from the state.
+
+        Args:
+            None
+
+        Returns:        
+            list[Participant]: List of participants.
+        """
         return self.participants
 
     def update_participant(self, participant: Participant) -> None:
+        """
+        Updates a participant in the state.
+
+        Args:
+            participant (Participant): Participant to be updated.
+
+        Returns:
+            None
+        """
         existing_participant = self.get_participant_by_name(participant.name)
         if existing_participant:
             existing_participant = participant
@@ -61,6 +134,17 @@ class State:
     def update_participant_opinion(
         self, name: str, old_opinion: str, opinion: str
     ) -> None:
+        """
+        Updates an opinion for a participant.
+
+        Args:
+            name (str): Name of the participant.
+            old_opinion (str): Old opinion to be removed.
+            opinion (str): New opinion to be added.
+
+        Returns:
+            None
+        """
         participant = self.get_participant_by_name(name)
         try:
             participant.opinions.remove(old_opinion)
@@ -71,7 +155,16 @@ class State:
 
 
 @st.dialog("🙋🏽‍♂️ Add Participant")
-def add_participant_dialog(state: State):
+def add_participant_dialog(state: State)->None:
+    """
+    Adds a participant to the state.
+
+    Args:
+        state (State): State object to add the participant to.
+
+    Returns:
+        None
+    """
     participant_name = st.text_input("Participant Name")
     participant_description = st.text_input("Participant Description")
     participant_opener = st.text_area("Participant Opening Statement")
@@ -85,7 +178,17 @@ def add_participant_dialog(state: State):
 
 
 @st.dialog("🗣 Add Opinion")
-def add_opinion_dialog(state: State, participant_name: str):
+def add_opinion_dialog(state: State, participant_name: str)->None:
+    """
+    Adds an opinion for a participant.
+
+    Args:
+        state (State): State object to add the opinion to.
+        participant_name (str): Name of the participant.
+
+    Returns:
+        None
+    """
     opinion = st.text_area("Opinion")
     add_opinion_button = st.button("Submit", key=f"submit_opinion_{participant_name}")
     if add_opinion_button:
@@ -95,6 +198,17 @@ def add_opinion_dialog(state: State, participant_name: str):
 
 @st.dialog("🦉 Edit Opinion")
 def edit_opinion_dialog(state: State, participant_name: str, opinion: str):
+    """
+    Edits an opinion for a participant.
+
+    Args:
+        state (State): State object to edit the opinion in.
+        participant_name (str): Name of the participant.
+        opinion (str): Opinion to be edited.
+
+    Returns:
+        None
+    """
     old_opinion = opinion
     new_opinion = st.text_area("Opinion", value=opinion)
     submit_opinion_button = st.button(
@@ -109,6 +223,18 @@ def edit_opinion_dialog(state: State, participant_name: str, opinion: str):
 
 @st.dialog("🦉 Edit Participant")
 def edit_participant_dialog(state: State, participant_name: str, participant_description: str, participant_opener: str):
+    """
+    Edits a participant in the state.
+
+    Args:
+        state (State): State object to edit the participant in.
+        participant_name (str): Name of the participant.
+        participant_description (str): Description of the participant.
+        participant_opener (str): Opening statement of the participant.
+
+    Returns:
+        None
+    """
     participant = state.get_participant_by_name(participant_name)
     participant_name = st.text_input("Participant Name", value=participant.name)
     participant_description = st.text_area(
@@ -129,6 +255,16 @@ def edit_participant_dialog(state: State, participant_name: str, participant_des
 
 
 def generate_debate_resolution(participants: list[Participant], debate_context: str):
+    """
+    Generates a debate resolution based on the given participants and debate context.
+
+    Args:    
+        participants (list[Participant]): List of participants in the debate.
+        debate_context (str): Context of the debate.
+
+    Returns:            
+        str: Debate resolution.
+    """
     with st.spinner("Generating resolution..."):
         try:
             participants_details = ""

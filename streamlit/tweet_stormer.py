@@ -31,12 +31,32 @@ if not all([API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET]):
 
 
 def validate_openai_api_key(openai_api_key: str) -> str:
+    """
+    Validates the OpenAI API key.
+
+    Args:
+        openai_api_key (str): The OpenAI API key.
+
+    Returns:        
+        str: The validated OpenAI API key.
+    """
+
     if not openai_api_key:
         st.error("❌ OpenAI API Key Not Found in .env File")
         st.stop()
 
 
 def get_openai_client() -> OpenAI:
+    """
+    Creates an OpenAI client.
+
+    Args:
+        None
+        
+    Returns:        
+        OpenAI: The OpenAI client.
+    """
+
     try:
         openai_api_key = os.getenv("OPENAI_API_KEY")
         validate_openai_api_key(openai_api_key)
@@ -47,16 +67,28 @@ def get_openai_client() -> OpenAI:
 
 
 def generate_system_prompt(context: str, tweet_context: str, tweet_number: int) -> str:
+    """
+    Generates the system prompt for the tweet generation.
+
+    Args:
+        context (str): The context for the tweets.
+        tweet_context (str): The description of the tweets.
+        tweet_number (int): The number of tweets to generate.
+
+    Returns:        
+        str: The system prompt.
+    """
+
     return f"""
     You are a highly skilled social media assistant specializing in crafting engaging, concise, and impactful tweets.
 
-Generate {tweet_number} professional tweets based on the following information:
+    Generate {tweet_number} professional tweets based on the following information:
 
-Context: {context}
-Tweet Description: {tweet_context}
-If the context requires a brief mention, keep the tweet concise and engaging. However, if the context needs detailed explanation, structure the tweet to clearly convey key insights while maintaining readability and impact.
+    Context: {context}
+    Tweet Description: {tweet_context}
+    If the context requires a brief mention, keep the tweet concise and engaging. However, if the context needs detailed explanation, structure the tweet to clearly convey key insights while maintaining readability and impact.
 
-Ensure each tweet is unique, follows best practices for social media engagement, and maintains a professional yet accessible tone. Keep tweets within 280 characters, incorporating relevant hashtags, compelling CTAs, and avoiding repetition. Align language with the provided context for maximum clarity and engagement.
+    Ensure each tweet is unique, follows best practices for social media engagement, and maintains a professional yet accessible tone. Keep tweets within 280 characters, incorporating relevant hashtags, compelling CTAs, and avoiding repetition. Align language with the provided context for maximum clarity and engagement.
     """
 
 
@@ -65,12 +97,14 @@ def generate_tweets(
 ) -> Union[GenerateTweetResponse, None]:
     """
     Generates tweets based on the given context and tweet description."
+
     Args:
         context (str): The context for the tweets.
         tweet_context (str): The description of the tweets.
         tweet_number (int): The number of tweets to generate.
+        
     Returns:
-        str: The generated tweets.
+        Union[GenerateTweetResponse, None]: The generated tweets.
     """
 
     try:
@@ -95,6 +129,18 @@ def generate_tweets(
 
 
 def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, None]:
+    """
+    Refines the given tweet based on the provided refine prompt.
+
+    Args:
+        tweet (Tweet): The tweet to refine.
+        refine_prompt (str): The refine prompt.
+        context (str): The context for the tweet.
+        
+    Returns:        
+        Union[Tweet, None]: The refined tweet.
+    """
+
     try:
         openai_client = get_openai_client()
         system_prompt = (
@@ -117,7 +163,17 @@ def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, N
         traceback.print_exc()
         return None
 
-def handle_rate_limits(response):
+def handle_rate_limits(response)-> bool:
+    """
+    Handles rate limits for the OpenAI API.
+
+    Args:
+        response (Response): The response object from the OpenAI API.
+        
+    Returns:        
+        bool: True if the rate limit was handled, False otherwise.
+    """
+
     try:
         reset_time = int(response.headers.get("x-rate-limit-reset", time.time()))
         remaining_requests = int(response.headers.get("x-rate-limit-remaining", 0))
@@ -148,7 +204,17 @@ def handle_rate_limits(response):
         print(f"❌ Failed to check rate limits: {str(e)}")
         return False
 
-def get_rate_limit_status(client):
+def get_rate_limit_status(client)-> tuple:
+    """
+    Gets the rate limit status for the OpenAI API.
+
+    Args:
+        client (Client): The OpenAI client.
+        
+    Returns:        
+        tuple: The remaining requests and reset time.
+    """
+
     try:
         rate_limit_status = client.get_rate_limit_status()
         remaining_requests = rate_limit_status["resources"]["statuses"]["/statuses/update"]["remaining"]
@@ -163,6 +229,20 @@ def get_rate_limit_status(client):
 
 
 def post_tweet(tweet_content: str, api_key, api_secret, access_token, access_secret) -> bool:
+    """
+    Posts a tweet to Twitter.
+
+    Args:
+        tweet_content (str): The content of the tweet.
+        api_key (str): The API key for the Twitter API.
+        api_secret (str): The API secret for the Twitter API.
+        access_token (str): The access token for the Twitter API.
+        access_secret (str): The access secret for the Twitter API.
+        
+    Returns:        
+        bool: True if the tweet was posted successfully, False otherwise.
+    """     
+
     try:
         client = tweepy.Client(
             consumer_key=api_key,
@@ -212,6 +292,7 @@ if st.session_state.get("tweets_generated") is None:
 
 
 def main():
+    """The main function to run the Tweet Stormer app."""
     st.set_page_config(page_title="Tweet Stormer 🚀", page_icon="🐦", layout="wide")
 
     st.title("🚀 Tweet Stormer 🐦")

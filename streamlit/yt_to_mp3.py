@@ -20,7 +20,16 @@ YDLP_OPTS = {
 }
 
 def setup_streamlit_app() -> None:
-    """Sets up the Streamlit UI and handles MP3 conversion."""
+    """
+    Sets up the Streamlit app.
+    
+    Args:
+        None
+        
+    Returns:        
+        None
+    """
+
     st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout=LAYOUT)
     st.title(f"▶️ {PAGE_TITLE}")
 
@@ -33,11 +42,16 @@ def setup_streamlit_app() -> None:
         provide_download_link(st.session_state['converted'])
 
 def convert_to_mp3(video_url: str) -> None:
-    """Downloads and converts a YouTube video to MP3.
+    """
+    Downloads and converts a YouTube video to MP3.
     
     Args:
         video_url (str): The URL of the YouTube video to convert.
+    
+    Returns:        
+        None    
     """
+    
     if not video_url:
         st.error("❌ Please enter a valid YouTube URL.")
         return
@@ -52,11 +66,16 @@ def convert_to_mp3(video_url: str) -> None:
         st.success("✅ Converted! You can download the MP3 now.")
 
 def provide_download_link(file_path: str) -> None:
-    """Provides a download button for the converted MP3 file and removes it after download.
+    """
+    Provides a download button for the converted MP3 file and removes it after download.
     
     Args:
         file_path (str): The path to the converted MP3 file.
+
+    Returns:        
+        None
     """
+
     with open(file_path, 'rb') as file:
         st.download_button("📥 Download MP3", file, file_name=os.path.basename(file_path), mime="audio/mp3")
     os.remove(file_path)

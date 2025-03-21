@@ -17,7 +17,16 @@ REQUIRED_ENV_VARS = ["OPENAI_API_KEY"]
 
 
 def install_requirements():
-    """Installs the requirements from requirements.txt file"""
+    """
+    Installs the requirements from requirements.txt file
+    
+    Args:
+        None
+        
+    Returns:        
+        None
+    """
+
     global requirements_installed, retries
     if requirements_installed:
         print("Requirements already installed.")
@@ -49,9 +58,27 @@ print("🚀 Setup complete. Continue to the next cell.")
 from dotenv import load_dotenv
 
 def setup_env():
-    """Sets up the environment variables"""
+    """
+    Sets up the environment variables
+    
+    Args:
+        None
+        
+    Returns:        
+        None
+    """
 
     def check_env(env_var):
+        """
+        Checks if the environment variable is set
+        
+        Args:
+            env_var (str): The environment variable to check
+            
+        Returns:        
+            None
+        """
+        
         value = os.getenv(env_var)
         if value is None:
             print(f"Please set the {env_var} environment variable.")
@@ -78,6 +105,15 @@ setup_env()
 import requests
 
 def downloader(book_name):
+    """
+    Downloads a PDF file from Google Books
+    
+    Args:
+        book_name (str): The name of the book to download
+        
+    Returns:        
+        None
+    """
     query = book_name.replace(" ", "+")
     url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
     response = requests.get(url).json()
@@ -101,7 +137,17 @@ def downloader(book_name):
 
 import pdfplumber
 
-def extract_text(pdf_file):
+def extract_text(pdf_file)-> str:
+    """
+    Extracts text from a PDF file
+    
+    Args:
+        pdf_file (str): The path to the PDF file
+        
+    Returns:        
+        str: The extracted text
+    """
+
     text = ""
     with pdfplumber.open(pdf_file) as pdf:
         for page in pdf.pages:
@@ -138,7 +184,17 @@ Your task is to produce comprehensive book summaries that capture the **key idea
     - Available Platforms (e.g., Amazon, Google Books, Audible, etc.)
 """
 
-def summarize_text(prompt):
+def summarize_text(prompt)-> str:
+    """
+    Summarizes a text using OpenAI's GPT-4 model
+    
+    Args:
+        prompt (str): The text to be summarized
+        
+    Returns:        
+        str: The summarized text
+    """
+
     try:
         response = openai.chat.completions.create(
         model = DEFAULT_MODEL,
@@ -155,10 +211,19 @@ def summarize_text(prompt):
 # In[23]:
 
 
-def generate_markdown(title, metadata, summary):
+def generate_markdown(title, metadata, summary)-> str:
     """
     Generate a detailed book summary in Markdown format.
+
+    Args:
+        title (str): The title of the book.
+        metadata (dict): A dictionary containing the book metadata.
+        summary (str): The summary of the book.
+
+    Returns:
+        str: The generated Markdown content.
     """
+
     missing_info = summarize_text(f"""
 Book: {title}
 Generate the following details:
@@ -172,7 +237,18 @@ Generate the following details:
 - Market Value
 """)
 
-    def extract_info(section, fallback):
+    def extract_info(section, fallback)-> str:
+        """
+        Extracts information from the summary based on the specified section.
+
+        Args:
+            section (str): The section to extract information from.
+            fallback (str): The fallback value if the information is not found.
+
+        Returns:
+            str: The extracted information.
+        """
+
         try:
             return missing_info.split(f"{section}:")[1].split('\n')[0].strip()
         except (IndexError, AttributeError):
@@ -218,7 +294,17 @@ Generate the following details:
 
 import requests
 
-def get_book_metadata(book_name):
+def get_book_metadata(book_name)-> dict:
+    """
+    Retrieves metadata for a book from Google Books API.
+
+    Args:
+        book_name (str): The name of the book.
+
+    Returns:
+        dict: A dictionary containing the book metadata.
+    """
+
     query = book_name.replace(" ", "+")
     url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
     response = requests.get(url).json()

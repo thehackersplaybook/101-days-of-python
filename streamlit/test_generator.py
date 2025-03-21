@@ -29,6 +29,18 @@ if "exam_name" not in st.session_state:
     st.session_state.exam_name = ""
 
 def generate_mcqs(subject: str, num_questions: int, difficulty: int) -> list:
+    """
+    Generates multiple-choice questions for a given subject and difficulty level.
+
+    Args:
+        subject (str): The subject for which the questions are generated.
+        num_questions (int): The number of questions to generate.
+        difficulty (int): The difficulty level of the questions (1=Easy, 5=Hard).
+        
+    Returns:        
+        list: The generated questions.
+    """
+
     prompt = f"""
     You are an expert professor generating {num_questions} MCQs for "{subject}". 
     Difficulty: {difficulty} (1=Easy, 5=Hard). 
@@ -62,6 +74,16 @@ def generate_mcqs(subject: str, num_questions: int, difficulty: int) -> list:
         return generate_sample_mcqs(subject, num_questions)
 
 def parse_questions(text: str) -> list:
+    """
+    Parses the text and extracts the multiple-choice questions.
+
+    Args:
+        text (str): The text containing the multiple-choice questions.
+        
+    Returns:        
+        list: The parsed multiple-choice questions.
+    """
+
     mcqs = []
     
     pattern = re.findall(r"Q\d+: (.*?)\nA\) (.*?)\nB\) (.*?)\nC\) (.*?)\nD\) (.*?)\nAnswer: (.*?)\n", text, re.DOTALL)
@@ -80,6 +102,17 @@ def parse_questions(text: str) -> list:
     return mcqs
 
 def generate_sample_mcqs(subject: str, num_questions: int) -> list:
+    """
+    Generates sample multiple-choice questions for a given subject and number of questions.
+
+    Args:
+        subject (str): The subject for which the questions are generated.
+        num_questions (int): The number of questions to generate.
+        
+    Returns:        
+        list: The generated questions.
+    """
+    
     mcqs = []
     for i in range(num_questions):
         question = f"Sample Question {i+1} for {subject}?"

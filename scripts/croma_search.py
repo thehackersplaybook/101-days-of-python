@@ -41,6 +41,7 @@ def extract_product_urls_from_markdown(markdown_content: str) -> list:
     Returns:
         list: A list of product page URLs.
     """
+
     product_urls = re.findall(
         r"https://www\.croma\.com[^\s]+/p/[^\s]+", markdown_content
     )
@@ -62,8 +63,9 @@ def search_croma(query: str) -> list[str]:
         query (str): The search query.
 
     Returns:
-        list: A list of products that match the query.
+        list[str]: A list of products that match the query.
     """
+
     try:
         url = "https://www.croma.com/search?q=" + requests.utils.quote(query)
         app = firecrawl
@@ -85,7 +87,7 @@ class ProductDetails(BaseModel):
     description: str
 
 
-async def scrape_product_details(url: str) -> ProductDetails:
+async def scrape_product_details(url: str) -> ProductDetails | None:
     """
     Scrape the product details from the given URL.
 
@@ -93,8 +95,9 @@ async def scrape_product_details(url: str) -> ProductDetails:
         url (str): The URL of the product.
 
     Returns:
-        dict: The product details.
+        ProductDetails | None: The product details.
     """
+
     try:
         agent = Agent(
             llm=ChatOpenAI(model="gpt-4o"),
@@ -135,8 +138,9 @@ async def scrape_all_product_details(
         products (list): The list of products.
 
     Returns:
-        list: The list of product details.
+        list[ProductDetails]: The list of product details.
     """
+
     product_details = []
     for url in product_urls:
         print(f"Scraping product details for: {url}")
@@ -152,11 +156,12 @@ def recommend_product(query: str, product_details: list[ProductDetails]) -> str:
 
     Args:
         query (str): The search query.
-        product_details (ProductDetails): The product details.
+        product_details (list[ProductDetails]): The product details.
 
     Returns:
         str: The recommendation message.
     """
+
     try:
         total_product_info = ""
         for product in product_details:
@@ -201,6 +206,7 @@ async def main():
     Returns:
         None
     """
+
     parser = argparse.ArgumentParser(description="Search for products on Croma.")
     parser.add_argument("--query", type=str, required=True, help="The search query.")
     args = parser.parse_args()

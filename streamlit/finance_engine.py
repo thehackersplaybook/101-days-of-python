@@ -51,6 +51,16 @@ FINANCE_KEYWORDS = [
 FINANCE_PATTERN = re.compile("|".join(FINANCE_KEYWORDS), re.IGNORECASE)
 
 def is_finance_related(query: str) -> bool:
+    """
+    Checks if the query is related to finance.
+
+    Args:
+        query (str): The query to be checked.
+
+    Returns:
+        bool: True if the query is related to finance, False otherwise.
+    """
+    
     return bool(FINANCE_PATTERN.search(query))
 
 

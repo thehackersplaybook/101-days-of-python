@@ -23,23 +23,29 @@ if "history" not in st.session_state:
 def get_language_code(language) -> str:
     """
     Get the language code from the language name.
+    
     Args:
         language (str): Language name.
-        Returns:
+
+    Returns:
         str: Language code.
-        """
+    """
+
     return list(LANGUAGES.keys())[list(LANGUAGES.values()).index(language.lower())]
 
 def translate_text(text, src_lang, target_lang) -> str:
     """
     Translate text from source language to target language.
+
     Args:
         text (str): Text to translate.
         src_lang (str): Source language code.
         target_lang (str): Target language code.
+
     Returns:
         str: Translated text.
-        """
+    """
+    
     with st.spinner("Translating Language"):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

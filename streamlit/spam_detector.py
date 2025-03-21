@@ -22,7 +22,17 @@ else:
 
 # Function to extract links from email body
 
-def extract_links(text):
+def extract_links(text)-> list:
+    """
+    Extracts links from the given text using regular expressions.
+
+    Args:
+        text (str): The text from which links are to be extracted.
+        
+    Returns:        
+        list: The extracted links.
+    """
+
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
     return url_pattern.findall(text)
 
@@ -55,26 +65,78 @@ judge_agent = Agent(
     handoffs=[content_agent, link_agent]
 )
 
-async def run_content_agent(email):
+async def run_content_agent(email)-> str:
+    """"
+    Runs the content agent on the given email.
+
+    Args:
+        email (dict): The email to be analyzed.
+        
+    Returns:        
+        str: The result of the content agent.
+    """
+
     result= await Runner.run(content_agent, email["Body"])
     return result.final_output
 
-async def run_link_agent(email):
+async def run_link_agent(email)-> str:
+    """
+    Runs the link agent on the given email.
+
+    Args:
+        email (dict): The email to be analyzed.
+        
+    Returns:        
+        str: The result of the link agent.
+    """
+
     links = ', '.join(email['links']) if email['links'] else 'No links found'
     result= await Runner.run(link_agent, links)
     return result.final_output
 
-async def run_metadata_agent(email):
+async def run_metadata_agent(email)-> str:
+    """"
+    Runs the metadata agent on the given email.
+
+    Args:
+        email (dict): The email to be analyzed.
+
+    Returns:
+        str: The result of the metadata agent.
+    """
+
     result= await Runner.run(metadata_agent, email["Subject"])
     return result.final_output
 
-async def run_judge_agent(content_result, link_result, meta_result):
+async def run_judge_agent(content_result, link_result, meta_result)-> str:
+    """
+    Runs the judge agent on the given content, link, and metadata results.
+
+    Args:
+        content_result (str): The result of the content agent.
+        link_result (str): The result of the link agent.
+        meta_result (str): The result of the metadata agent.
+
+    Returns:
+        str: The final decision of the judge agent.
+    """
+
     combined_input = f"Content: {content_result}\nLinks: {link_result}\nMetadata: {meta_result}"
     result = await Runner.run(judge_agent, combined_input)
     return result.final_output
 
 
 def setup_streamlit_app():
+    """
+    Sets up the Streamlit app.
+    
+    Args:
+        None
+        
+    Returns:        
+        None
+    """
+    
     st.set_page_config(page_title="AI Email Spam Detector", page_icon="💀", layout="wide")
     st.title("⚠️ AI Email Spam Detector")
 

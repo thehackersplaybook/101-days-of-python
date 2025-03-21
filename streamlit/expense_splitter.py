@@ -11,6 +11,7 @@ def process_expenses(expenses: List[Dict[str, any]]) -> Dict[str, float]:
     Returns:
         Dict[str, float]: Dictionary mapping each person to their owed amount.
     """
+
     paid_amounts = {}
     owed_amounts = {}
 
@@ -45,6 +46,7 @@ def update_balances(paid_amounts: Dict[str, float], owed_amounts: Dict[str, floa
     Returns:
         Dict[str, float]: Final balances after accounting for payments and owed amounts.
     """
+    
     balances = {}
     all_people = set(paid_amounts.keys()).union(set(owed_amounts.keys()))
 

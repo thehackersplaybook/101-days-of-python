@@ -32,6 +32,7 @@ def init():
     Returns:
         None
     """
+
     load_dotenv(override=True, dotenv_path=".env")
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -57,6 +58,7 @@ def generate_questions(
     Returns:
         - List[str]: A list of generated questions.
     """
+
     try:
         prompt = f"""
         Generate {num_questions} personalized interview questions for a candidate applying for the role of '{role}'.
@@ -179,7 +181,11 @@ def add_header_footer(canvas: Canvas, doc: SimpleDocTemplate) -> None:
     Args:
         canvas (Canvas): The ReportLab canvas object.
         doc (SimpleDocTemplate): The document being generated.
+
+    Returns:
+        None
     """
+
     canvas.saveState()
     _, height = A4
 
@@ -206,6 +212,7 @@ def get_styled_paragraph(text: str, style_name: str) -> Paragraph:
     Returns:
         Paragraph: A formatted paragraph object.
     """
+
     styles = getSampleStyleSheet()
 
     custom_styles = {
@@ -280,7 +287,11 @@ def markdown_to_pdf(content: str, filename: str) -> None:
     Args:
         content (str): The markdown content to be converted.
         filename (str): The output PDF file name.
+
+    Returns:
+        None
     """
+
     try:
         # Setup the document
         doc = SimpleDocTemplate(
@@ -361,7 +372,11 @@ def generate_pdf(content: str, filename: str) -> None:
     Args:
         content (str): The text content to include in the PDF.
         filename (str): The output PDF file name.
+
+    Returns:
+        None
     """
+    
     return markdown_to_pdf(content, filename)
 
 
@@ -375,6 +390,7 @@ def extract_resume_content_from_file(uploaded_file: Any) -> str:
     Returns:
         str: The extracted text content.
     """
+
     if uploaded_file is None:
         st.error("No file uploaded. Please upload a valid PDF file.")
         return ""
@@ -406,6 +422,7 @@ def setup_streamlit_app() -> None:
     Returns:
         None
     """
+
     st.set_page_config(
         layout="wide", page_title="AI Interview Questions Generator", page_icon="💼"
     )

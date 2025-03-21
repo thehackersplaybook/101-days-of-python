@@ -23,22 +23,28 @@ st.metric(label="Counter", value=st.session_state.counter)
 def update_history(action):
     """
     Function to update the history of actions
+    
     Args:
         action (str): The action performed
+    
     Returns:
         None
-        """
+    """
+
     st.session_state.history[action].append(f"{action}: {st.session_state.counter}")
 
 # Function to increment counter
 def increment_counter():
     """
     Function to increment the counter.
+
     Args:
         None
+    
     Returns:
         None
     """
+
     st.session_state.counter += 1
     update_history("Increment")
 
@@ -46,11 +52,14 @@ def increment_counter():
 def decrement_counter():
     """
     Function to decrement the counter.
+    
     Args:
         None
+    
     Returns:
         None
     """
+    
     st.session_state.counter -= 1
     update_history("Decrement")
 
@@ -58,11 +67,14 @@ def decrement_counter():
 def reset_counter():
     """
     Function to reset the counter to 0
+    
     Args:
         None
+    
     Returns:
         None
     """
+
     st.session_state.counter = 0
     update_history("Reset")
 

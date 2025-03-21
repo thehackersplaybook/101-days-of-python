@@ -52,7 +52,17 @@ c.execute('''CREATE TABLE IF NOT EXISTS reports
              (id INTEGER PRIMARY KEY, filename TEXT, content BLOB, explanation TEXT)''')
 conn.commit()
 
-def extract_pdf_text(file):
+def extract_pdf_text(file)-> str:
+    """
+    Extracts text from a PDF file.
+
+    Args:
+        file (str): The path to the PDF file.
+
+    Returns: 
+        str: The extracted text.
+    """
+
     text = ""
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
@@ -61,7 +71,17 @@ def extract_pdf_text(file):
                 text += page_text + "\n\n"
     return text.strip()
 
-def explain_medical_report(text):
+def explain_medical_report(text)-> str:
+    """
+    Explains a medical report using the OpenAI API.
+
+    Args:
+        text (str): The text of the medical report.
+
+    Returns: 
+        str: The explanation of the medical report.
+    """
+    
     with st.spinner("🤖 AI is Writing Medical Explanation..."):
         prompt = f"Explain this medical report in very simple language:\n{text}"
         response = openai.chat.completions.create(

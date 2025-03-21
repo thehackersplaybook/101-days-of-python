@@ -26,14 +26,17 @@ print(f"Loaded API Key: {os.getenv('OPENAI_API_KEY')}")
 def get_recipes_from_ingredients(ingredients, item, cuisine, num_recipes=5) -> list:
     """
     Generate recipes based on the provided ingredients and cuisine.
+
     Args:
         ingredients (str): Comma-separated list of ingredients.
         item (str): The item to be made.
         cuisine (str): The cuisine of the recipe.
         num_recipes (int): The number of recipes to generate.
+
     Returns:
         list: A list of dictionaries containing the recipe details.
     """
+
     system_prompt = f"""
 Create {num_recipes} unique and authentic {cuisine} recipes using the following core ingredients: {ingredients}.
 Generate a high-quality recipe for {item} in {cuisine} style, ensuring that it strictly adheres to the provided ingredients.
@@ -69,11 +72,14 @@ Do not include any additional text or explanations.
 def display_recipes(recipes):
     """
     Display the generated recipes on the Streamlit app.
+    
     Args:
         recipes (list): A list of dictionaries containing the recipe details.
+
     Returns:
         None
     """
+    
     num_columns = 3  
     columns = st.columns(num_columns)
     

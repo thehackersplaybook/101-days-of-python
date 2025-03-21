@@ -28,10 +28,12 @@ def get_chat_response(prompt: str, user_id: str) -> str:
 
     Args:
         prompt (str): The prompt to use for the chatbot.
+        user_id (str): The user ID to use for the chatbot.
 
     Returns:
         str: The response from the chatbot.
     """
+
     relevant_memories = memory.search(query=prompt, user_id=user_id, limit=3)
     memories_text = "\n".join(f"- {entry['memory']}" for entry in relevant_memories)
     system_prompt = f"You are a helpful AI. Answer the question based on query and memories.\nUser Memories:\n{memories_text}"
@@ -63,8 +65,8 @@ def run_chatbot() -> None:
 
     Returns:
         None
-
     """
+    
     user_id = str(uuid4())
     print("Hello! I am a simple chatbot.")
     print("You can ask me anything, and I will try to respond.")
