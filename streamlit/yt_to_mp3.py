@@ -2,48 +2,65 @@ import streamlit as st
 import yt_dlp
 import os
 
-# Set up Streamlit app
-def setup_streamlit_app():
-    st.set_page_config(page_title="Youtube to MP3 Converter", page_icon="🎵", layout="wide")
-    st.title("▶️ Youtube to MP3 Converter")
+# Constants
+PAGE_TITLE = "Youtube to MP3 Converter"
+PAGE_ICON = "🎵"
+LAYOUT = "wide"
+OUTPUT_DIR = "downloads"
+YDLP_OPTS = {
+    "format": "bestaudio/best",
+    "postprocessors": [
+        {
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+        }
+    ],
+    "outtmpl": f"{OUTPUT_DIR}/%(title)s.%(ext)s",
+}
 
-    # Input for YouTube URL
-    video_url = st.text_input("🔗 Enter Youtube URL:")
+def setup_streamlit_app() -> None:
+    """Sets up the Streamlit UI and handles MP3 conversion."""
+    st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout=LAYOUT)
+    st.title(f"▶️ {PAGE_TITLE}")
+
+    video_url: str = st.text_input("🔗 Enter Youtube URL:")
 
     if st.button("🎵 Convert to MP3"):
-        st.write("⏳ Converting...")
+        convert_to_mp3(video_url)
 
-        # Download settings
-        output_dir = "downloads"
-        os.makedirs(output_dir, exist_ok=True)  # Ensure the downloads folder exists
+    if st.session_state.get('converted'):
+        provide_download_link(st.session_state['converted'])
 
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }],
-            "outtmpl": f"{output_dir}/%(title)s.%(ext)s",  # Save with video title
-        }
-
-        # Download audio
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            output_file = f"{output_dir}/{info['title']}.mp3"
-
-        # Confirm conversion
+def convert_to_mp3(video_url: str) -> None:
+    """Downloads and converts a YouTube video to MP3.
+    
+    Args:
+        video_url (str): The URL of the YouTube video to convert.
+    """
+    if not video_url:
+        st.error("❌ Please enter a valid YouTube URL.")
+        return
+    
+    st.write("⏳ Converting...")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
+    with yt_dlp.YoutubeDL(YDLP_OPTS) as ydl:
+        info = ydl.extract_info(video_url, download=True)
+        output_file = f"{OUTPUT_DIR}/{info['title']}.mp3"
         st.session_state['converted'] = output_file
         st.success("✅ Converted! You can download the MP3 now.")
 
-    # Show download button
-    if st.session_state.get('converted'):
-        with open(st.session_state['converted'], 'rb') as file:
-            st.download_button("📥 Download MP3", file, file_name=os.path.basename(st.session_state['converted']), mime="audio/mp3")
-
-        # Remove file after download
-        os.remove(st.session_state['converted'])
-        st.session_state['converted'] = None
+def provide_download_link(file_path: str) -> None:
+    """Provides a download button for the converted MP3 file and removes it after download.
+    
+    Args:
+        file_path (str): The path to the converted MP3 file.
+    """
+    with open(file_path, 'rb') as file:
+        st.download_button("📥 Download MP3", file, file_name=os.path.basename(file_path), mime="audio/mp3")
+    os.remove(file_path)
+    st.session_state['converted'] = None
 
 if __name__ == "__main__":
     setup_streamlit_app()

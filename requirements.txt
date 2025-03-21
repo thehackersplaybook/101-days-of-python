@@ -35,3 +35,4 @@ reportlab==4.3.1
 markdown2==2.5.3
 PyPDF2==3.0.1
 streamlit-extras==0.6.0
+tiktoken

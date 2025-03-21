@@ -1,0 +1,11 @@
+[project]
+name = "auxknow-mcp"
+version = "0.1.0"
+description = "AuxKnow MCP server."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "auxknow>=0.0.18",
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.4.1",
+]
