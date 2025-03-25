@@ -7,10 +7,12 @@ import re
 from agents import Agent
 from agents import Runner
 import asyncio
+import tensorflow_probability as tfp
+import tensorflow.keras as keras
 
+tfd = tfp.distributions
 
 load_dotenv()
-
 
 api_key = os.getenv('OPENAI_API_KEY')
 
@@ -36,7 +38,7 @@ def extract_links(text)-> list:
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
     return url_pattern.findall(text)
 
-# Content Agent: Analyzes email content for spam
+# Content Agent: Analyzes email content for spam signals
 
 content_agent= Agent(
     name="Content Agent",
