@@ -31,8 +31,6 @@ def load_apps():
 APPS = load_apps()
 
 
-
-
 def validate_openai_api_key(openai_key) -> bool:
     """
     Validate the OpenAI API key by making an API request.
@@ -67,7 +65,7 @@ def system_info() -> dict:
         dict: A dictionary containing the system details.
     """
     try:
-        if not st.session_state.openai_key:
+        if not st.session_state.get("openai_key",None):
             st.error("⚠️ Please enter your OpenAI API Key to check the compatibility.")
             st.stop()
 
