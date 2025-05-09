@@ -1,148 +1,227 @@
 import streamlit as st
-import pdfplumber
-import openai
-import sqlite3
-from fpdf import FPDF
-from cryptography.fernet import Fernet
+from openai import OpenAI, OpenAIError
 import os
-from dotenv import load_dotenv
-import asyncio
+import fitz
+from PIL import Image
+import traceback
 
-
-load_dotenv()
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-st.set_page_config(page_title="Bharat HealthEasy.ai 🚑", page_icon="⚕️", layout="wide")
-st.title("🩺 Bharat HealthEasy 🚑")
-st.caption("Upload your Medical Reports and Get Easy Explanation")
-
-ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))
-
-if not os.path.exists(ENV_PATH) or "SECRET_KEY" not in open(ENV_PATH).read():
-    secret_key = Fernet.generate_key().decode()
-    with open(ENV_PATH, "w") as file:
-        file.write(f"SECRET_KEY={secret_key}\n")
-        
-    st.warning("🔑 Secret Key Generated — Restart App.")
-    st.warning("🔑 Secret Key Generated — Please restart the app manually.")
-    st.stop()
-
-    load_dotenv(dotenv_path=ENV_PATH, override=True)
-    st.stop()
-
-load_dotenv(dotenv_path=ENV_PATH, override=True)
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-
-if not SECRET_KEY:
-    st.error("❌ SECRET_KEY Not Found in .env file. Try restarting the app.")
-    st.stop()
-
-cipher = Fernet(SECRET_KEY)
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-if not openai.api_key:
-    st.error("❌ OpenAI API Key Not Found in .env File")
-    st.stop()
-
-conn = sqlite3.connect("data/medical_reports.db")
-c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS reports 
-             (id INTEGER PRIMARY KEY, filename TEXT, content BLOB, explanation TEXT)''')
-conn.commit()
-
-def extract_pdf_text(file)-> str:
+def validate_openai_key(openai_key: str) -> bool:
     """
-    Extracts text from a PDF file.
-
-    Args:
-        file (str): The path to the PDF file.
-
-    Returns: 
-        str: The extracted text.
-    """
-
-    text = ""
-    with pdfplumber.open(file) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n\n"
-    return text.strip()
-
-def explain_medical_report(text)-> str:
-    """
-    Explains a medical report using the OpenAI API.
-
-    Args:
-        text (str): The text of the medical report.
-
-    Returns: 
-        str: The explanation of the medical report.
-    """
+    Validates the OpenAI API key by making a test request using the OpenAI v1 API.
     
-    with st.spinner("🤖 AI is Writing Medical Explanation..."):
-        prompt = f"Explain this medical report in very simple language:\n{text}"
-        response = openai.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an expert doctor explaining medical reports."},
-                {"role": "user", "content": prompt}
+    Args:
+        openai_key (str): The OpenAI API key to validate.
+        
+    Returns:
+        bool: True if the key is valid, False otherwise.
+    """
+    if not openai_key:
+        return False
+    try:
+        OpenAI(api_key=openai_key).models.list()
+        return True
+    except OpenAIError:
+        return False
+    except Exception as e:
+        print(f"Unexpected issue during API key validation: {e}")
+        traceback.print_exc()
+        return False
+    
+def display_pdf_first_page_as_image(uploaded_file):
+    """
+    Extracts the first page of the uploaded PDF and converts it into an image.
+
+    Args:
+        uploaded_file: The uploaded PDF file.
+
+    Returns:
+        PIL.Image: The first page of the PDF as an image.
+    """
+    try:
+        # Open the uploaded PDF file
+        pdf_document = fitz.open(stream=uploaded_file, filetype="pdf")
+        first_page = pdf_document[0]  # Get the first page
+        pix = first_page.get_pixmap()  # Render the page as a pixmap
+        image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        return image
+    except Exception as e:
+        st.error(f"Error processing the PDF: {e}")
+        traceback.print_exc()
+        return None
+    
+def extract_text_from_pdf(uploaded_file):
+    """
+    Extracts text from the uploaded PDF file.
+
+    Args:
+        uploaded_file: The uploaded PDF file.
+
+    Returns:
+        str: The extracted text from the PDF.
+    """
+    try:
+        pdf_document = fitz.open(stream=uploaded_file, filetype="pdf")
+        extracted_text = ""
+        for page in pdf_document:
+            extracted_text += page.get_text()
+        return extracted_text
+    except Exception as e:
+        st.error(f"Error extracting text from PDF: {e}")
+        traceback.print_exc()
+        return None
+    
+def medical_file_uploader():
+        uploaded_file = st.file_uploader("", type=["pdf"])
+        if uploaded_file:
+            pdf_bytes = uploaded_file.read()
+            first_page_image = display_pdf_first_page_as_image(uploaded_file = pdf_bytes)
+            if first_page_image:
+                st.sidebar.image(first_page_image, caption="Uploaded Medical Report", width=200)
+            return pdf_bytes
+        return None
+
+def is_valid_medical_report(extracted_text):
+    """
+    Checks if the extracted text is a valid medical report.
+
+    Args:
+        extracted_text: The extracted text from the PDF.
+
+    Returns:
+        bool: True if the text is a valid medical report, False otherwise.
+    """
+    try:
+        client = OpenAI()
+        response = client.responses.create(
+            model = "gpt-4o-mini",
+            instructions = "Check if the extracted text is a medical report or not. If not then return 0 otherwise return 1.",
+            input = [
+                {
+                    "role": "developer",
+                    "content": "Check if the extracted text is a medical report or not."
+                },
+                {
+                    "role": "user",
+                    "content": extracted_text
+                }
             ]
         )
-        return response.choices[0].message.content
-
-uploaded_file = st.file_uploader("📄 Upload Medical Report (PDF Only)", type=["pdf"])
-
-if uploaded_file is not None:
-    st.success("✅ Report Uploaded Successfully")
-    with st.spinner("🔍 Reading PDF Report..."):
-        text = extract_pdf_text(uploaded_file)
+        if response.output_text == "1":
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in text generation: {e}")
+        traceback.print_exc()
+        return False
     
-    if not text:
-        st.error("❌ PDF is Empty or Not Readable")
-        st.stop()
+def medical_report_analyzer(extracted_text, openai_key):
+    """
+    Analyzes the uploaded medical report PDF file.
+
+    Args:
+        uploaded_file: The uploaded PDF file.
+
+    Returns:
+        str: The analysis result.
+    """
+    try:
+        # Set OpenAI API key
+        if not openai_key:
+            raise ValueError("OpenAI API key is required.")
+        if is_valid_medical_report(extracted_text) == False:
+            report_error_message = "The uploaded file is not a valid medical report. Please upload a valid medical report."
+            st.error(report_error_message)
+            return None
         
-    encrypted_text = cipher.encrypt(text.encode())
+        # Generate report analysis using OpenAI
+        client = OpenAI()
+        response = client.responses.create(
+            model = "gpt-4.1",
+            instructions = f"Analyze the medical report and talk like a doctor to provide medical insights.",
+            input = [
+                {
+                    "role": "developer",
+                    "content": "Analyze the medical report and provide detailed medical insights."
+                },
+                {
+                    "role": "user",
+                    "content": extracted_text
+                }
+            ]
+        )
+        return response.output_text
+    except Exception as e:
+        print(f"Error in text generation: {e}")
+        traceback.print_exc()
+        return None
+    
 
-    explanation = explain_medical_report(text)
+# UI for the Streamlit app
+def main():
+    st.set_page_config(page_title="HealthifyAI", page_icon=":guardsman:", layout="wide")
+    st.title("HealthifyAI - Medical Report Analyzer")
+    st.caption("Upload a PDF medical report to extract and analyze the text.")
 
-    c.execute("INSERT INTO reports (filename, content, explanation) VALUES (?, ?, ?)", 
-              (uploaded_file.name, encrypted_text, explanation))
-    conn.commit()
+    # Sidebar for OpenAI API Key
+    with st.sidebar:
+        st.header("🔑 API Key Management")
+        openai_key = st.text_input("Enter your OpenAI API Key:", type="password", key="api_key_input_sidebar", placeholder="sk-XXXXXXXXXXXXXXXXXXXXXXXXXX", help="Get your API key from https://platform.openai.com/signup")
 
-    st.subheader("📑 Report Content")
-    st.write(text)
+        col1, col2 = st.columns(2)
+        if col1.button("💾 Save API Key"):
+            if not openai_key:
+                st.warning("❌ Please fill in the API key field before saving.")
+            else:
+                with st.spinner("⏳ Validating API key..."):
+                    is_valid = validate_openai_key(openai_key)
+                    if is_valid:
+                        st.toast("API key saved successfully! ✅")
+                    else:
+                        st.toast("Invalid OpenAI API key. Please check and try again. ❌")
+        if col2.button("🔄 Reset API Key"):
+            if not openai_key:
+                st.warning("❌ No API key to reset.")
+            else:
+                with st.spinner("Resetting API key..."):
+                    st.session_state.openai_key = None
+                    st.success("OpenAI API key reset successfully!")
+        st.markdown("---")
 
-    st.subheader("🧠 AI Explanation")
-    st.success(explanation)
+    tab1, tab2 = st.tabs(["🔍 Analyze Medical Report", "📄 Analyze Prescription"])
 
-    if st.button("📥 Download Full Report"):
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="Bharat HealthEasy.ai Report", ln=True, align='C')
-        pdf.multi_cell(0, 10, f"Original Report:\n{text}")
-        pdf.multi_cell(0, 10, f"\nAI Explanation:\n{explanation}")
-        pdf.output("Medical_Report.pdf")
-        st.download_button("Download Report", data=open("Medical_Report.pdf", "rb"), file_name="Medical_Report.pdf")
+    with tab1:
+        st.markdown("")
+        st.subheader("🔍 Understand Your Medical Report")
+        st.caption("Have some doubts about your medical report? Upload it here and let AI explain it for you.")
 
-if st.button("🗑️ Delete All Reports"):
-    with st.spinner("🗑️ Deleting All Reports..."):
-        c.execute("DELETE FROM reports")
-        conn.commit()
-        st.success("✅ All Reports Deleted")
-        st.stop()
+        # Use session state to track file upload and extracted text
+        if "file_uploaded" not in st.session_state:
+            st.session_state.file_uploaded = False
+        if "extracted_text" not in st.session_state:
+            st.session_state.extracted_text = ""
 
-st.subheader("📂 Previous Reports")
-c.execute("SELECT * FROM reports")
-reports = c.fetchall()
+        pdf_bytes = medical_file_uploader()
+        if pdf_bytes and not st.session_state.file_uploaded:
+            with st.spinner("⏳ Extracting text from the PDF..."):
+                extracted_text = extract_text_from_pdf(pdf_bytes)
+                if extracted_text:
+                    st.session_state.file_uploaded = True
+                    st.session_state.extracted_text = extracted_text
+                    st.toast("✅ File Uploaded Successfully!")
+                else:
+                    st.error("❌ Failed to upload file. Please try again.")
 
-for report in reports:
-    with st.expander(f"{report[1]}"):
-        decrypted_text = cipher.decrypt(report[2]).decode()
-        st.write("### Original Report")
-        st.write(decrypted_text)
-        st.write("### AI Explanation")
-        st.success(report[3])
+        if st.button("🧠 Analyze Report"):
+            if not openai_key:
+                st.warning("❌ Please enter your OpenAI API key")
+            else:
+                with st.spinner("⏳ Analyzing Report..."):
+                    analysis_result = medical_report_analyzer(extracted_text= extracted_text, openai_key= openai_key)
+                    if analysis_result:
+                        st.success("✅ Analysis completed!")
+                        st.write(analysis_result)
+                    
+    
+if __name__ == "__main__":
+    main()

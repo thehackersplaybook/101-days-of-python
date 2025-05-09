@@ -15,7 +15,7 @@ import json
 import os
 
 def load_apps():
-    file_path = os.path.join(os.path.dirname(__file__), "application_name.json")
+    file_path = os.path.join(os.path.dirname(__file__), "data/application_name.json")
     
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")

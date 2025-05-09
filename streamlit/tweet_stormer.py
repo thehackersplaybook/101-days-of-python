@@ -2,23 +2,20 @@ import streamlit as st
 import os
 import traceback
 from typing import Union
-from openai import OpenAI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import tweepy
 import requests
 import time
 import datetime
+from openai import OpenAI
+from openai._exceptions import OpenAIError
 
 
 load_dotenv(override=True, dotenv_path=".env")
 
 ## constants
 DEFAULT_OPENAI_MODEL = "gpt-4o"
-API_KEY = os.getenv("API_KEY")
-API_SECRET = os.getenv("API_SECRET")
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
-ACCESS_SECRET = os.getenv("ACCESS_SECRET")
 
 class Tweet(BaseModel):
     content: str
@@ -26,44 +23,29 @@ class Tweet(BaseModel):
 class GenerateTweetResponse(BaseModel):
     tweets: list[Tweet]
 
-if not all([API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET]):
-    raise ValueError("❌ Missing API credentials. Check your .env file.")
 
-
-def validate_openai_api_key(openai_api_key: str) -> str:
+def validate_openai_key(openai_key: str) -> bool:
     """
-    Validates the OpenAI API key.
-
+    Validates the OpenAI API key by making a test request using the OpenAI v1 API.
+    
     Args:
-        openai_api_key (str): The OpenAI API key.
-
-    Returns:        
-        str: The validated OpenAI API key.
-    """
-
-    if not openai_api_key:
-        st.error("❌ OpenAI API Key Not Found in .env File")
-        st.stop()
-
-
-def get_openai_client() -> OpenAI:
-    """
-    Creates an OpenAI client.
-
-    Args:
-        None
+        openai_key (str): The OpenAI API key to validate.
         
-    Returns:        
-        OpenAI: The OpenAI client.
+    Returns:
+        bool: True if the key is valid, False otherwise.
     """
-
+    if not openai_key:
+        return False
     try:
-        openai_api_key = os.getenv("OPENAI_API_KEY")
-        validate_openai_api_key(openai_api_key)
-        return OpenAI(api_key=openai_api_key)
+        OpenAI(api_key=openai_key).models.list()
+        return True
+    except OpenAIError:
+        return False
     except Exception as e:
-        print(f"Failed to create OpenAI client. Error: {str(e)}")
+        print(f"Unexpected issue during API key validation: {e}")
         traceback.print_exc()
+        return False
+
 
 
 def generate_system_prompt(context: str, tweet_context: str, tweet_number: int) -> str:
@@ -93,7 +75,7 @@ def generate_system_prompt(context: str, tweet_context: str, tweet_number: int) 
 
 
 def generate_tweets(
-    context: str, tweet_context: str, tweet_number: int
+    context: str, tweet_context: str, tweet_number: int, openai_key: str
 ) -> Union[GenerateTweetResponse, None]:
     """
     Generates tweets based on the given context and tweet description."
@@ -108,9 +90,18 @@ def generate_tweets(
     """
 
     try:
-        openai_client = get_openai_client()
+         # Validate the key
+        if not validate_openai_key(openai_key):
+            raise ValueError("Invalid OpenAI API key. Please check and try again.")
+        
+        # Create an OpenAI client instance
+        openai_client = OpenAI(api_key=openai_key)
+        
+        # Generate the system prompt
         system_prompt = generate_system_prompt(context, tweet_context, tweet_number)
-        response = openai_client.beta.chat.completions.parse(
+
+        # Call the OpenAI API to generate tweets
+        response = openai_client.responses.create(
             model=DEFAULT_OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -119,16 +110,19 @@ def generate_tweets(
                     "content": f"Context: {context}\nTweet Context: {tweet_context}\n Generate {tweet_number} tweets.",
                 },
             ],
-            response_format=GenerateTweetResponse,
         )
-        return response.choices[0].message.parsed
+        # Extract messages from the response
+        tweets_list = [Tweet(content=choice.message.content.strip()) for choice in response.choices]
+
+        return GenerateTweetResponse(tweets=tweets_list)
+    
     except Exception as e:
         print(f"Failed to generate tweets. Error: {str(e)}")
         traceback.print_exc()
         return None
 
 
-def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, None]:
+def refine_tweet(tweet: Tweet, refine_prompt: str, openai_key: str, context="") -> Union[Tweet, None]:
     """
     Refines the given tweet based on the provided refine prompt.
 
@@ -142,11 +136,20 @@ def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, N
     """
 
     try:
-        openai_client = get_openai_client()
+         # Validate key
+        if not validate_openai_key(openai_key):
+            raise ValueError("Invalid OpenAI API key. Please check and try again.")
+
+        # Create OpenAI client
+        openai_client = OpenAI(api_key=openai_key)
+
+        # Generate the system prompt
         system_prompt = (
             "Refine the tweet strictly based on the provided instructions, enhancing clarity, engagement, and impact while maintaining a 280-character limit. Ensure precision, readability, and alignment with the given input without introducing additional context."
         )
-        response = openai_client.beta.chat.completions.parse(
+
+        # Call the OpenAI API to refine the tweet
+        response = openai_client.responses.create(
             model=DEFAULT_OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -155,9 +158,12 @@ def refine_tweet(tweet: Tweet, refine_prompt: str, context="") -> Union[Tweet, N
                     "content": f"Context: {context}\nOriginal Tweet: {tweet.content}\nRefinement Instructions: {refine_prompt}",
                 },
             ],
-            response_format=Tweet,
         )
-        return response.choices[0].message.parsed
+
+         # Return the refined tweet
+        refined_text = response.choices[0].message.content.strip()
+        return Tweet(content=refined_text)
+    
     except Exception as e:
         print(f"Failed to refine tweet. Error: {str(e)}")
         traceback.print_exc()
@@ -301,19 +307,40 @@ def main():
         "Tweet Stormer is a Twitter Bot that generates Tweets based on a given context."
     )
 
-    st.sidebar.title("📝 Configuration")
+    # Setup API Key
+    with st.sidebar:
+        st.title("⚙️ Configuration")
+    
+    with st.sidebar.expander("🔑 OpenAI and Twitter API Credentials"):
+        openai_key = st.text_input("Enter your OpenAI API Key:", type="password", key="api_key_input_sidebar",placeholder="sk-XXXXXXXXXXXXXXXXXXXXXXXXXX", help="Get your API key from https://platform.openai.com/signup")
+        user_api_key = st.text_input("X API Key", type="password", placeholder="Enter your X API Key", key="user_api", help="Get your API key from https://developer.twitter.com/en/docs/twitter-api/getting-started")
+        user_api_secret = st.text_input("X API Secret", type="password", placeholder="Enter your X API Secret", key="user_api_secret", help="Get your API secret from https://developer.twitter.com/en/docs/twitter-api/getting-started")
+        user_access_token = st.text_input("Access Token", type="password", placeholder="Enter your Access Token", key="user_access_token", help="Get your access token from https://developer.twitter.com/en/docs/twitter-api/getting-started")
+        user_access_secret = st.text_input("Access Secret", type="password", placeholder="Enter your Access Secret", key="user_access_secret", help="Get your access secret from https://developer.twitter.com/en/docs/twitter-api/getting-started")
+        st.markdown("---")
 
-    if "remaining_requests" in st.session_state and "reset_time" in st.session_state:
-        st.sidebar.subheader("📊 API Rate Limits")
-        st.sidebar.write(f"✅ **Remaining Requests:** {st.session_state['remaining_requests']}")
-        st.sidebar.write(f"🕒 **Resets At:** {st.session_state['reset_time']}")
+        col1, col2 = st.columns(2)
 
+        # Spinner for validating the API key
+        if col1.button("💾 Save API Keys"):
+            if not openai_key or not user_api_key or not user_api_secret or not user_access_token or not user_access_secret:
+                st.warning("❌ Please fill in all fields before saving.")
+            else:
+                with st.spinner("⏳ Validating API key..."):
+                    is_valid = validate_openai_key(openai_key)
+                if is_valid:
+                    st.toast("API keys saved successfully! ✅")
+                else:
+                    st.toast("Invalid OpenAI API key. Please check and try again. ❌")
 
-    with st.sidebar.expander("🔑 Twitter API Credentials"):
-        user_api_key = st.text_input("X API Key", type="password")
-        user_api_secret = st.text_input("X API Secret", type="password")
-        user_access_token = st.text_input("Access Token", type="password")
-        user_access_secret = st.text_input("Access Secret", type="password")
+        if col2.button("🔄 Reset API Keys"):
+            with st.spinner("Resetting API key..."):
+                openai_key = ""
+                user_api_key = ""
+                user_api_secret = ""
+                user_access_token = ""
+                user_access_secret = ""
+                st.success("OpenAI key reset successfully!")
 
     context = st.sidebar.text_input(
         "📝 Context", placeholder="Enter your context here..."
@@ -331,21 +358,37 @@ def main():
 
     tweets = st.session_state.tweets_generated
 
-    if st.sidebar.button("🔄 Generate Tweets"):
-        if not context or not tweet_context or not tweet_number:
-            st.warning("❌ Please fill in all fields before generating tweets.")
+    col1, col2 = st.sidebar.columns(2)
+    if col1.button("🔄 Generate Tweets"):
+        if not openai_key:
+            st.warning("❌ Please enter a valid OpenAI API key before generating tweets.")
+        elif not user_api_key or not user_api_secret or not user_access_token or not user_access_secret:
+            st.warning("❌ Please enter valid X API credentials before generating tweets.")
         else:
-            tweets_response = generate_tweets(context, tweet_context, tweet_number)
-
-            if not tweets_response:
-                st.error("❌ Failed to generate tweets. Please try again.")
+            if not context or not tweet_context or not tweet_number:
+                st.warning("❌ Please fill in all fields before generating tweets.")
             else:
-                for key in list(st.session_state.keys()):
-                    if key.startswith("post_status_"):
-                        del st.session_state[key]
+                with st.spinner("⏳ Generating tweets..."):
+                    tweets_response = generate_tweets(context, tweet_context, tweet_number, openai_key)
 
-            st.session_state.tweets_generated = tweets_response.tweets
-            st.rerun()
+                    if not tweets_response:
+                        st.error("❌ Failed to generate tweets. Please try again.")
+                    else:
+                        for key in list(st.session_state.keys()):
+                            if key.startswith("post_status_"):
+                                del st.session_state[key]
+
+                        st.session_state.tweets_generated = tweets_response.tweets
+                        st.rerun()
+
+    if col2.button("🧹 Clear Tweets"):
+        st.session_state.tweets_generated = []
+        for key in list(st.session_state.keys()):
+            if key.startswith("post_status_") or key.startswith("refine_"):
+                del st.session_state[key]
+        st.success("🧼 Cleared generated tweets.")
+        st.rerun()
+
 
     if tweets and len(tweets) > 0:
         st.success("✅ Tweets Generated Successfully!")
@@ -362,7 +405,7 @@ def main():
                 post_tweet_button = column2.button("🚀 Post Tweet", key=f"post_tweet_{idx}")
 
                 if post_tweet_button:
-                    if not all ([user_api_key, user_api_secret, user_access_token, user_access_secret]):
+                    if not all([user_api_key, user_api_secret, user_access_token, user_access_secret]):
                         st.error("❌ Please enter valid X API credentials before posting.")
                     else:
                         success = post_tweet(tweet.content, user_api_key, user_api_secret, user_access_token, user_access_secret)
@@ -371,7 +414,7 @@ def main():
                             st.success("✅ Tweet Posted Successfully!")
                             st.rerun()
                         else:
-                            st.error("❌ Failed to post tweet. Please try again.")
+                            column2.error("❌ Failed to post tweet.")
 
             column1, column2 = st.columns([1, 2])
             refine_input_prompt = column1.text_input(
@@ -384,7 +427,7 @@ def main():
             st.markdown("---")
                 
             if refine_button:
-                refined_tweet = refine_tweet(tweet, refine_input_prompt, context)
+                refined_tweet = refine_tweet(tweet, refine_input_prompt, openai_key, context)
                 if refined_tweet:
                     st.session_state.tweets_generated[idx] = refined_tweet
                     post_key = f"post_status_{idx}"
