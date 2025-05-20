@@ -19,19 +19,22 @@ Total : 12 Completed
 ## Incomplete Streamlit Apps:
 
 - Medical Report Analyzer ( In progress)
-- Spam Detector ( In progress )
 - Interviewer ( Prompt need to be fixed )
-- Test Generator ( Need to change the whole app's UI with Shanatanu's Guidance)
 - System Compatibility Checker ( Need to check if it is working with other user's devices)
+- 
 
 Total : 6 Incompleted
 
+## Scripts
+
+All Scripts Are Completed
 
 ## Completed Notebooks:
 
 - AI Powered PRD Generator
 - Basic Python Exercises
 - Context Adherence
+- Councel
 - Dependency Version Checker
 - Dream Interpreter
 - Gita Insights
@@ -50,3 +53,15 @@ Total : 6 Incompleted
 
 - Asli Engineering 
 - Hot Readme Generator
+- Dl Twitter Sentiment
+- Groq Information Density
+- Openai Quote Generator
+- Openai Tool Use
+- Phi4 Tool Use
+- Practical Reverse Engineering 
+- 
+
+
+
+## Notes : 
+
