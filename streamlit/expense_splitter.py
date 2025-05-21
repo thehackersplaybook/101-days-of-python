@@ -53,7 +53,7 @@ with tab1:
     with st.form("expense_form"):
         col1, col2 = st.columns(2)
         with col1:
-            expense = st.number_input("Amount Paid (₹)", min_value=0.0, format="%.2f")
+            expense = st.number_input("Amount Paid (₹)", min_value=0.0, format="%.f")
             payer = st.text_input("Paid By")
         with col2:
             participants = st.text_input("Participants (comma-separated)")
@@ -61,14 +61,15 @@ with tab1:
 
         submit = st.form_submit_button("💾 Add Expense")
 
-        if submit and expense > 0 and payer and participants:
-            participants_list = [p.strip() for p in participants.split(",")]
-            new_expense = {"Expense": float(expense), "Payer": payer, "Participants": participants_list, "Notes": notes}
-            st.session_state.expenses.append(new_expense)
-            st.session_state.success_msg = "✅ Expense added successfully!"
-            st.rerun()
-        else:
-            st.toast("Please fill all the fields.", icon="❌")
+        if submit:
+            if expense > 0 and payer and participants:
+                participants_list = [p.strip() for p in participants.split(",")]
+                new_expense = {"Expense": float(expense), "Payer": payer, "Participants": participants_list, "Notes": notes}
+                st.session_state.expenses.append(new_expense)
+                st.session_state.success_msg = "✅ Expense added successfully!"
+                st.rerun()
+            else:
+                st.toast("Please fill all the fields.", icon="❌")
 
 with tab2:
     st.subheader("📊 Overview")
@@ -99,4 +100,10 @@ with tab2:
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("No expenses added yet.")
+        st.info("No expenses added yet.")
+
+    if st.session_state.expenses:
+        if st.button("🗑️ Clear All Expenses"):
+            st.session_state.expenses = []
+            st.session_state.success_msg = "✅ All expenses cleared!"
+            st.rerun()

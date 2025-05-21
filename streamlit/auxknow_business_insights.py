@@ -12,7 +12,6 @@ load_dotenv(override=True, verbose=True)
 # Initialize AuxKnow with API keys
 auxknow = AuxKnow(
     perplexity_api_key=os.getenv("PERPLEXITY_API_KEY"),
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
     api_key=os.getenv("PERPLEXITY_API_KEY"), 
     openai_api_key=os.getenv("OPENAI_API_KEY")
 )

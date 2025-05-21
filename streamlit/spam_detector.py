@@ -4,13 +4,8 @@ import openai
 from dotenv import load_dotenv
 import os
 import re
-from agents import Agent
-from agents import Runner
+from agents import Agent, Runner
 import asyncio
-import tensorflow_probability as tfp
-import tensorflow.keras as keras
-
-tfd = tfp.distributions
 
 load_dotenv()
 

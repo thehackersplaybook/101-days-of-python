@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 
-st.set_page_config(page_title="Profesional Calculator", layout="centered", page_icon="🧮")
+st.set_page_config(page_title="Profesional Calculator", layout="wide", page_icon="🧮")
 
 def calculate(operation, num1 ,num2=None) -> int:
     """
@@ -95,9 +95,9 @@ with tab2:
      if st.session_state.history:
           for entry in st.session_state.history:
                st.write(entry)
-          if (st.button("Delete History", key="del_btn")):
-               st.session_state.history = []
-               st.success("History deleted")
+          if st.button("Delete History", key="del_btn"):
+                st.session_state.history = []
+                st.rerun()
      else:
           st.info("No calculations performed yet")
 st.markdown(

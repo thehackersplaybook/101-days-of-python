@@ -1,5 +1,5 @@
 import streamlit as st  # Importing Streamlit library for creating UI
-st.set_page_config(page_title= "Counter App", layout="centered",page_icon="⏱️")  # Setting the page title and layout
+st.set_page_config(page_title= "Counter App", layout="wide",page_icon="⏱️")  # Setting the page title and layout
 
 # Title of the app
 st.title("Professional Counter App")

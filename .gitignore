@@ -172,6 +172,7 @@ cython_debug/
 
 output.json
 output.md
+completed_notebooks.md
 cache
 .DS_Store
 outputs/

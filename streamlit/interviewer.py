@@ -1,5 +1,3 @@
-
-
 import reportlab.lib
 import streamlit as st
 import traceback
@@ -510,36 +508,48 @@ def setup_streamlit_app() -> None:
                             st.sidebar.error("⚠️ The uploaded file is empty or unreadable. Please upload a valid PDF file.")
             
             if not st.session_state.get("show_file_uploader", False):
+                # Initialize variables with default values
+                skills = ""
+                experience = ""
+                projects = ""
+                num_questions = DEFAULT_NUM_QUESTIONS  # Default value for num_questions
+
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
                     skills = st.text_area(
-                    "🛠️ Key Skills",
-                    placeholder="e.g. Python, Machine Learning, Data Structures",
-                    height=150,
-                    key="skills",
-                        )
+                        "🛠️ Key Skills",
+                        placeholder="e.g. Python, Machine Learning, Data Structures",
+                        height=150,
+                        key="skills",
+                    )
                 with col2:
                     experience = st.text_area(
-                    "💼 Work Experience",
-                    placeholder="e.g. 2 years in software development",
-                    height=150,
-                    key="experience",
-                )
+                        "💼 Work Experience",
+                        placeholder="e.g. 2 years in software development",
+                        height=150,
+                        key="experience",
+                    )
                 with col3:
                     projects = st.text_area(
-                    "🚀 Projects",
-                    placeholder="e.g. Built a recommendation system",
-                    height=150,
-                    key="projects",
-                )
-                num_questions = st.slider("🔥 Number of Questions", 1, 20, 10)
+                        "🚀 Projects",
+                        placeholder="e.g. Built a recommendation system",
+                        height=150,
+                        key="projects",
+                    )
+                num_questions = st.slider("🔥 Number of Questions", 1, 20, 10)  # Slider for num_questions
 
             if st.button("🚀 Generate Questions"):
+                # Ensure variables are initialized before use
+                skills = skills if "skills" in locals() else ""
+                experience = experience if "experience" in locals() else ""
+                projects = projects if "projects" in locals() else ""
+                num_questions = num_questions if "num_questions" in locals() else DEFAULT_NUM_QUESTIONS
+
                 if not role or (not skills and not resume_text) or (not experience and not resume_text) or (not projects and not resume_text):
                     st.warning("⚠️ Please fill in all fields before generating questions.")
                 else:
-                    with st.spinner("Generating questions..."):
+                    with st.spinner("Generating questions...",show_time=True):
                         questions = generate_questions(
                         role=role,
                         skills=skills,
@@ -637,4 +647,4 @@ def setup_streamlit_app() -> None:
         
 if __name__ == "__main__":
     init()
-    setup_streamlit_app()
+setup_streamlit_app()
