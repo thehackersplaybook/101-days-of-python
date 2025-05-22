@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker, Session
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
-import uvicorn
 
 DATABASE_URL = "sqlite:///./notes.db"
 
@@ -48,7 +47,7 @@ class NoteOut(BaseModel):
     updated_at: datetime
 
     model_config = {
-        "from_attributes": True  # ✅ New in Pydantic v2
+        "from_attributes": True
     }
 
 # ------------------ DEPENDENCY ------------------

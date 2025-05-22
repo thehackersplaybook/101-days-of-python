@@ -11,7 +11,7 @@ from markdownify import markdownify as md
 from firecrawl import FirecrawlApp
 from browser_use import Agent
 from langchain_openai import ChatOpenAI
-
+    
 
 DEFAULT_SEARCH_PAGE_THRESHOLD = 18000
 
