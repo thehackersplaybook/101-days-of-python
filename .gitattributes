@@ -1,2 +1,0 @@
-ffmpeg-2025-05-05-git-f4e72eb5a3-full_build/bin/*.exe filter=lfs diff=lfs merge=lfs -text
-*.exe filter=lfs diff=lfs merge=lfs -text
