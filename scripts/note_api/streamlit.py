@@ -3,7 +3,7 @@ import requests
 API_URL = "http://127.0.0.1:3000"
 
 st.set_page_config(page_title="Note Taking App", layout="wide")
-st.title("📝 FastAPI + Streamlit Note Taking App")
+st.title("📝 Note Taking App")
 
 
 tab1, tab2, tab3 = st.tabs(["Create Note", "Delete Note", "Update Note"])
@@ -51,6 +51,8 @@ with st.sidebar:
     response = requests.get(f"{API_URL}/notes/")
     if response.status_code == 200:
         notes = response.json()
+        if notes:
+            st.sidebar.subheader("Notes List")
         for note in notes:
             with st.expander(note["title"]):
                 st.markdown(f"**ID:** {note['id']}")
