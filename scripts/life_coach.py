@@ -31,6 +31,7 @@ async def main() -> None:
     Returns:
         None
     """
+    
     client = AsyncOpenAI()
     console.print("Realtime Life Coach Chatbot", style="title")
     console.print("=" * 30, style="banner")

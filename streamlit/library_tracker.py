@@ -2,20 +2,82 @@ import streamlit as st
 from typing import List, Dict
 
 def initialize_session_state() -> None:
-    """Initializes the session state for storing books."""
+    """
+    Initializes the session state for storing books.
+    """
     if "books" not in st.session_state:
         st.session_state.books = []
 
 def add_book(title: str, author: str, status: str) -> None:
-    """Adds a book to the session state if all fields are filled."""
+    """
+    Adds a book to the session state if all fields are filled.
+
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+Returns:        
+        None
+    
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+Returns:        
+        None
+    
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+Returns:        
+        None
+    
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+Returns:        
+        None
+    
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+Returns:        
+        None
+    
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        status (str): The status of the book.
+
+    Returns:        
+        None
+    """
     if title and author and status:
         st.session_state.books.append({"title": title, "author": author, "status": status})
-        st.sidebar.success(f"Added {title} by {author} ({status})")
+        st.sidebar.success(f"Added '{title}' by {author} ({status})")
     else:
         st.sidebar.error("⚠️ Please fill in all fields")
 
 def filter_books(books: List[Dict[str, str]], search_query: str, filter_status: str) -> List[Dict[str, str]]:
-    """Filters books based on search query and status."""
+    """
+    Filters books based on search query and status.
+
+    Args:
+        books (List[Dict[str, str]]): List of books.
+        search_query (str): Search query.
+        filter_status (str): Filter status.
+
+    Returns:        
+        List[Dict[str, str]]: Filtered books.
+    """
     search_query = search_query.lower()
     filtered_books = [
         book for book in books
@@ -23,10 +85,33 @@ def filter_books(books: List[Dict[str, str]], search_query: str, filter_status: 
     ]
     if filter_status != "All":
         filtered_books = [book for book in filtered_books if book["status"] == filter_status]
+    
+    # Check for empty categories
+    if filter_status == "All" or filter_status == "Reading":
+        reading_books = [book for book in filtered_books if book["status"] == "Reading"]
+        if not reading_books:
+            st.warning("No books in the 'Reading' category")
+    if filter_status == "All" or filter_status == "Finished":
+        finished_books = [book for book in filtered_books if book["status"] == "Finished"]
+        if not finished_books:
+            st.warning("No books in the 'Finished' category")
+    if filter_status == "All" or filter_status == "To Read":
+        to_read_books = [book for book in filtered_books if book["status"] == "To Read"]
+        if not to_read_books:
+            st.warning("No books in the 'To Read' category")
+    
     return filtered_books
 
 def display_books(books: List[Dict[str, str]]) -> None:
-    """Displays books with formatted UI elements."""
+    """
+    Displays books with formatted UI elements.
+
+    Args:
+        books (List[Dict[str, str]]): List of books.
+
+    Returns:
+        None
+    """
     status_colors = {
         "Reading": "#6c757d",
         "Finished": "#28a745",
@@ -38,7 +123,7 @@ def display_books(books: List[Dict[str, str]]) -> None:
             st.markdown(
                 f"""
                 <div style="
-                    border: 1px;
+                    border: 1px solid #444;
                     border-radius: 8px;
                     padding: 15px;
                     margin-bottom: 12px;
@@ -66,10 +151,11 @@ def display_books(books: List[Dict[str, str]]) -> None:
                 unsafe_allow_html=True
             )
     else:
-        st.info("No books found.")
+        st.markdown("---")
 
 def main():
     """Main function to run the Streamlit Book Tracker app."""
+    st.set_page_config(page_title="Book Tracker", page_icon="📚", layout="wide")
     st.title("📕 Book Tracker")
     st.write("Welcome to the Book Tracker!")
     

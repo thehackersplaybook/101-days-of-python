@@ -37,6 +37,7 @@ def get_openai_client() -> OpenAI:
     Returns:
         OpenAI: The OpenAI instance.
     """
+    
     return OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -50,6 +51,7 @@ def get_deepgram_client() -> DeepgramClient:
     Returns:
         DeepgramClient: The DeepgramClient instance.
     """
+
     return DeepgramClient(api_key=os.getenv("DEEPGRAM_API_KEY"))
 
 
@@ -63,6 +65,7 @@ def transcribe_audio(file_path: str) -> str:
     Returns:
         str: The transcribed text.
     """
+
     try:
         client = get_deepgram_client()
         with open(file_path, "rb") as audio_file:
@@ -91,6 +94,7 @@ def record_voice() -> str:
     Returns:
         str: The path to the temporary audio file.
     """
+
     print("Press 'T' when you are ready to talk.")
     while True:
         if input().strip().upper() == "T":
@@ -100,6 +104,19 @@ def record_voice() -> str:
     audio_buffer = []
 
     def callback(indata, frames, time, status):
+        """
+        Callback function to handle audio data.
+
+        Args:
+            indata (np.ndarray): The audio data.
+            frames (int): The number of frames.
+            time (float): The current time.
+            status (int): The status of the callback.
+
+        Returns:
+            None
+        """
+
         audio_buffer.append(indata.copy())
 
     with sd.InputStream(callback=callback):
@@ -122,23 +139,30 @@ def record_voice() -> str:
     return audio_file_path
 
 
-def play_audio(file_path: str):
+def play_audio(file_path: str)-> None:
     """
     Play the audio file to the user.
 
     Args:
         file_path (str): The path to the audio file.
+    
+    Returns:
+        None
     """
+
     audio_segment = AudioSegment.from_file(file_path, format="mp3")
     play(audio_segment)
 
 
-def clean_audio(file_path: str):
+def clean_audio(file_path: str)-> None:
     """
     Clean the audio file to remove noise and background disturbances.
 
     Args:
         file_path (str): The path to the audio file.
+
+    Returns:
+        None
     """
     audio_segment = AudioSegment.from_file(file_path, format="mp3")
     cleaned_audio = normalize(audio_segment)
@@ -156,6 +180,7 @@ def get_magic_ball_verdict(transcription: str) -> str:
     Returns:
         str: The magic ball verdict.
     """
+
     try:
         system_prompt = """
         You are Crystal Ball, an unpredictable, witty, and sassy oracle. You respond to any question with a mix of sarcasm, appreciation, empathy, and occasional roasting. Your goal is to make interactions fun, engaging, and sometimes brutally honest while keeping responses humorous and lighthearted.
@@ -226,6 +251,7 @@ def extract_transcript_text(transcription_json: str) -> str:
     Returns:
         str: The total text in the entire transcript.
     """
+
     try:
         transcription = json.loads(transcription_json)
         results = transcription["results"]
