@@ -1,0 +1,4 @@
+ipython
+python-dotenv
+sqlite-utils
+litellm
