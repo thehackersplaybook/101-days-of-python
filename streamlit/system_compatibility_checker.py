@@ -11,9 +11,6 @@ import json
 
 DEFAULT_MODEL = "gpt-4o"
 
-import json
-import os
-
 def load_apps():
     file_path = os.path.join(os.path.dirname(__file__), "data/application_name.json")
     

@@ -1,0 +1,6 @@
+ipython
+python-dotenv
+requests
+defusedxml
+google-generativeai
+youtube-transcript-api

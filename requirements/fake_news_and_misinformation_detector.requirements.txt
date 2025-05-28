@@ -1,0 +1,5 @@
+ipython
+python-dotenv
+firecrawl
+litellm
+pydantic

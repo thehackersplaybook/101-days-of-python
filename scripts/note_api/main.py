@@ -14,7 +14,7 @@ Base = declarative_base()
 
 app = FastAPI(title="Note Taking API", description="A modern FastAPI-based note taking backend", version="1.0.0")
 
-# ------------------ DATABASE MODEL ------------------
+# DATABASE MODEL
 class Note(Base):
     __tablename__ = "notes"
 
@@ -27,7 +27,7 @@ class Note(Base):
 
 Base.metadata.create_all(bind=engine)
 
-# ------------------ SCHEMAS ------------------
+# SCHEMAS
 class NoteCreate(BaseModel):
     title: str
     content: str
@@ -50,7 +50,6 @@ class NoteOut(BaseModel):
         "from_attributes": True
     }
 
-# ------------------ DEPENDENCY ------------------
 def get_db():
     db = SessionLocal()
     try:
@@ -58,7 +57,7 @@ def get_db():
     finally:
         db.close()
 
-# ------------------ CRUD ENDPOINTS ------------------
+#  ROUTES
 @app.post("/notes/", response_model=NoteOut, status_code=201)
 def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     db_note = Note(**note.dict())
