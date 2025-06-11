@@ -1,0 +1,6 @@
+ipython
+python-dotenv
+beautifulsoup4
+requests
+markdownify
+youtube-transcript-api

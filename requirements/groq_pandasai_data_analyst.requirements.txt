@@ -1,0 +1,7 @@
+ipython
+python-dotenv
+groq
+instructor
+pandas
+pandasai
+pydantic

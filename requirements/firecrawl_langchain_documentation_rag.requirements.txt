@@ -1,0 +1,8 @@
+ipython
+python-dotenv
+firecrawl
+langchain
+langchain-openai
+langchain-anthropic
+langchain-core
+langchain-text-splitters

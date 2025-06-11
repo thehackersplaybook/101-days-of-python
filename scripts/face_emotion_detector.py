@@ -26,6 +26,7 @@ def print_banner() -> None:
     Returns:
         None
     """
+
     banner = Text(
         """
     ***************************************
@@ -47,6 +48,7 @@ def image_to_base64(image_path: str) -> str:
     Returns:
         str: Base64 encoded string of the image.
     """
+
     with open(image_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
     return encoded_string
@@ -62,6 +64,7 @@ def detect_emotion(file_path: str) -> str:
     Returns:
         str: Detected emotion.
     """
+
     media_type = detect_media_type(file_path)
     image_data = image_to_base64(file_path)
     message = client.messages.create(
@@ -100,6 +103,7 @@ def detect_media_type(file_path: str) -> str:
     Returns:
         str: Media type of the file.
     """
+
     mime_type, _ = mimetypes.guess_type(file_path)
     if mime_type and mime_type.startswith("image/"):
         return mime_type
@@ -116,6 +120,7 @@ def print_emotion(emotion: str) -> None:
     Returns:
         None
     """
+    
     console.print(f"Detected Emotion: {emotion}", style="bold green")
 
 

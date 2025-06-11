@@ -8,7 +8,6 @@ load_dotenv(dotenv_path=".env", override=True)
 async def main() -> None:
     """
     Sets up the chatbot and runs the chatbot in a loop.
-
     Demonstrates the Open AI Realtime API.
 
     Args:
@@ -17,6 +16,7 @@ async def main() -> None:
     Returns:
         None
     """
+
     client = AsyncOpenAI()
     print("Realtime chatbot started. Type a message to get a response.")
     print("Type 'exit' to stop the chatbot.")
