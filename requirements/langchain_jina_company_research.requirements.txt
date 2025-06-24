@@ -1,0 +1,8 @@
+ipython
+python-dotenv
+requests
+langchain
+langchain-community
+openai
+google-generativeai
+markdownify

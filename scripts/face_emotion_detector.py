@@ -137,10 +137,13 @@ def main():
         emotion = detect_emotion(args.face_path)
         print_emotion(emotion)
     elif args.live:
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(3)  # Try 1, 2, etc. if 0 doesn't work
         console.print("Press 'Enter' to capture an image.", style="bold yellow")
         while True:
             ret, frame = cap.read()
+            if not ret or frame is None:
+                console.print("Failed to grab frame from camera.", style="bold red")
+                break
             cv2.imshow("Live Camera", frame)
             if cv2.waitKey(1) & 0xFF == ord("\r"):
                 image_path = "captured_image.jpg"

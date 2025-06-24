@@ -1,0 +1,6 @@
+ipython
+python-dotenv
+pydantic
+instructor
+groq
+openai
