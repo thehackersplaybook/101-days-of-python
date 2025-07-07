@@ -1,0 +1,6 @@
+cv2
+ultralytics
+numpy
+os
+datetime
+random
