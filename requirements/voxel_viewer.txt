@@ -1,0 +1,8 @@
+trimesh
+numpy
+moderngl
+moderngl-window
+pyrr
+pygame
+Pillow
+opencv-python
